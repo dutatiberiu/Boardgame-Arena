@@ -92,4 +92,4 @@ Board Game Arena/
 
 ## License
 
- free to use
+ free to use - powered by Duta Tiberiu
