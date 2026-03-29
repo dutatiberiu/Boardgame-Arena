@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Board Game Arena</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <div class="page">
+
+    <!-- ============================================================
+         HEADER
+         ============================================================ -->
+    <header>
+      <div class="ornament">
+        <div class="ornament-line"></div>
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line"></div>
+      </div>
+      <h1>Board Game Arena</h1>
+      <p class="subtitle">Choose Your Battle</p>
+    </header>
+
+    <!-- ============================================================
+         GAME CARDS
+         ============================================================ -->
+    <div class="games-grid">
+
+      <!-- CHESS CARD -->
+      <a href="Chess/index.html" class="game-card">
+        <div class="card-preview chess-preview">
+          <div class="chess-board-mini" id="chessMini"></div>
+        </div>
+        <div class="card-content">
+          <div class="card-badge">♚ Classic Strategy</div>
+          <div class="card-title">Chess</div>
+          <p class="card-desc">
+            Challenge the Stockfish AI in a game of chess and fight for checkmate.
+          </p>
+          <div class="card-features">
+            <span class="feature-tag">Stockfish AI</span>
+            <span class="feature-tag">Game Statistics</span>
+            <span class="feature-tag">FIDE Rules</span>
+            <span class="feature-tag">Easy / Hard</span>
+          </div>
+          <div class="card-cta">
+            Play now <span class="cta-arrow">→</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- BACKGAMMON CARD -->
+      <a href="Backgammon/index.html" class="game-card">
+        <div class="card-preview backgammon-preview">
+          <div class="bg-board-mini">
+            <div class="bg-half">
+              <div class="bg-points-row">
+                <div class="bg-point t1"></div>
+                <div class="bg-point t2"></div>
+                <div class="bg-point t1"></div>
+                <div class="bg-point t2"></div>
+                <div class="bg-point t1"></div>
+                <div class="bg-point t2"></div>
+              </div>
+              <div class="bg-points-row">
+                <div class="bg-point up t2"></div>
+                <div class="bg-point up t1"></div>
+                <div class="bg-point up t2"></div>
+                <div class="bg-point up t1"></div>
+                <div class="bg-point up t2"></div>
+                <div class="bg-point up t1"></div>
+              </div>
+            </div>
+            <div class="bg-bar"></div>
+            <div class="bg-half">
+              <div class="bg-points-row">
+                <div class="bg-point t2"></div>
+                <div class="bg-point t1"></div>
+                <div class="bg-point t2"></div>
+                <div class="bg-point t1"></div>
+                <div class="bg-point t2"></div>
+                <div class="bg-point t1"></div>
+              </div>
+              <div class="bg-points-row">
+                <div class="bg-point up t1"></div>
+                <div class="bg-point up t2"></div>
+                <div class="bg-point up t1"></div>
+                <div class="bg-point up t2"></div>
+                <div class="bg-point up t1"></div>
+                <div class="bg-point up t2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="card-badge">⚂ Dice & Tactics</div>
+          <div class="card-title">Backgammon</div>
+          <p class="card-desc">
+            Roll the dice and move your pieces toward home. The AI evaluates
+            every move strategically — can you beat it?
+          </p>
+          <div class="card-features">
+            <span class="feature-tag">Heuristic AI</span>
+            <span class="feature-tag">Canvas Render</span>
+            <span class="feature-tag">Bearing Off</span>
+            <span class="feature-tag">Pip Count</span>
+          </div>
+          <div class="card-cta">
+            Play now <span class="cta-arrow">→</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- TIC TAC TOE CARD -->
+      <a href="Tic%20Tac%20Toe/index.html" class="game-card">
+        <div class="card-preview ttt-preview">
+          <div class="ttt-board-mini">
+            <div class="ttt-cell ttt-x"></div>
+            <div class="ttt-cell ttt-o"></div>
+            <div class="ttt-cell ttt-x"></div>
+            <div class="ttt-cell"></div>
+            <div class="ttt-cell ttt-x"></div>
+            <div class="ttt-cell ttt-o"></div>
+            <div class="ttt-cell ttt-o"></div>
+            <div class="ttt-cell"></div>
+            <div class="ttt-cell"></div>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="card-badge">✕ Simple Strategy</div>
+          <div class="card-title">Tic Tac Toe</div>
+          <p class="card-desc">
+            Challenge a friend or test your skills against the unbeatable
+            Minimax AI. One wrong move is all it takes.
+          </p>
+          <div class="card-features">
+            <span class="feature-tag">Minimax AI</span>
+            <span class="feature-tag">2-Player</span>
+            <span class="feature-tag">Easy / Hard</span>
+            <span class="feature-tag">Score Tracking</span>
+          </div>
+          <div class="card-cta">
+            Play now <span class="cta-arrow">→</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- CHECKERS CARD -->
+      <a href="Checkers/index.html" class="game-card">
+        <div class="card-preview checkers-preview">
+          <div class="checkers-board-mini" id="checkersMini"></div>
+        </div>
+        <div class="card-content">
+          <div class="card-badge">○ Classic Board Game</div>
+          <div class="card-title">Checkers</div>
+          <p class="card-desc">
+            Jump over enemies, crown your kings, and outmaneuver the
+            Minimax AI with Alpha-Beta pruning across four difficulty levels.
+          </p>
+          <div class="card-features">
+            <span class="feature-tag">Minimax AI</span>
+            <span class="feature-tag">Game Statistics</span>
+            <span class="feature-tag">4 Difficulties</span>
+          </div>
+          <div class="card-cta">
+            Play now <span class="cta-arrow">→</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- ============================================================
+         BOTTOM ORNAMENT
+         ============================================================ -->
+    <div class="bottom-ornament">
+      <div class="bo-line"></div>
+      <span class="bo-text">More games coming soon</span>
+      <div class="bo-line"></div>
+    </div>
+
+    <footer>
+      Board Game Arena — Have fun · lowkey. ·
+      <a href="https://github.com" target="_blank">GitHub Pages Ready</a>
+    </footer>
+
+  </div>
+
+  <script src="js/app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chess Arena</title>
+  <meta name="description" content="Chess Arena — Play chess against Stockfish directly in your browser.">
+  <meta property="og:title" content="Chess Arena">
+  <meta property="og:description" content="Play chess against Stockfish directly in your browser.">
+  <meta name="theme-color" content="#0a0a0c">
+
+  <!-- External dependencies (CDN) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=DM+Sans:ital,wght@0,400;0,500;0,700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <nav class="arena-nav">
+      <a href="../index.html" class="arena-nav-link">← Board Game Arena</a>
+    </nav>
+    <h1>&#9818; Chess Arena</h1>
+    <p>You vs. Stockfish</p>
+  </header>
+
+  <!-- DIALOG — Choose color at start -->
+  <div id="colorOverlay" class="overlay visible" role="dialog" aria-modal="true" aria-label="Choose color">
+    <div class="dialog">
+      <h2>Choose Your Color</h2>
+      <p>Which side do you want to play?</p>
+      <div class="color-options">
+        <button class="color-btn" onclick="startGame('white')" title="Play as white" aria-label="Play as white">&#9812;</button>
+        <button class="color-btn" onclick="startGame('black')" title="Play as black" aria-label="Play as black">&#9818;</button>
+      </div>
+      <div class="difficulty-selector">
+        <label>Difficulty</label>
+        <button class="diff-btn" data-level="easy">Easy</button>
+        <button class="diff-btn active" data-level="medium">Medium</button>
+        <button class="diff-btn" data-level="hard">Hard</button>
+        <button class="diff-btn" data-level="expert">Expert</button>
+        <div class="elo-slider-row">
+          <input type="range" id="eloSlider" class="elo-slider" min="400" max="3200" step="50" value="1500">
+          <span class="elo-value" id="eloValue">1500</span>
+        </div>
+      </div>
+      <div class="time-selector">
+        <label>Time Control</label>
+        <button class="time-btn active" data-time="none">No Clock</button>
+        <button class="time-btn" data-time="3+2">3+2</button>
+        <button class="time-btn" data-time="5+3">5+3</button>
+        <button class="time-btn" data-time="10+0">10+0</button>
+        <button class="time-btn" data-time="15+10">15+10</button>
+        <button class="time-btn" data-time="custom">Custom</button>
+        <div class="custom-time-row hidden" id="customTimeRow">
+          <input type="number" id="customBase" class="custom-time-input" min="1" max="120" value="5" aria-label="Minutes"> min +
+          <input type="number" id="customIncrement" class="custom-time-input" min="0" max="60" value="3" aria-label="Increment"> sec
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIALOG — Pawn promotion -->
+  <div id="promotionOverlay" class="promotion-overlay hidden" role="dialog" aria-modal="true" aria-label="Choose promotion piece">
+    <div class="promotion-dialog">
+      <h3>Promotion</h3>
+      <div class="promotion-options" id="promotionOptions"></div>
+    </div>
+  </div>
+
+  <!-- DIALOG — Confirm resignation -->
+  <div id="confirmOverlay" class="confirm-overlay hidden" role="dialog" aria-modal="true" aria-label="Confirm resignation">
+    <div class="confirm-dialog">
+      <h3>Resign?</h3>
+      <p>Are you sure you want to resign this game?</p>
+      <div class="confirm-actions">
+        <button class="btn btn-danger" onclick="confirmResign()">Yes, resign</button>
+        <button class="btn" onclick="hideConfirmDialog()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIALOG — Game Result -->
+  <div id="resultOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Game result">
+    <div class="result-modal">
+      <div class="result-modal-icon result-win">&#9813;</div>
+      <h2 class="result-modal-title result-win">Victory!</h2>
+      <p class="result-modal-detail">Checkmate! You win!</p>
+      <p class="result-modal-moves">0 moves</p>
+      <div class="result-modal-actions">
+        <button class="btn btn-primary" onclick="closeDialog(DOM.resultOverlay); showColorDialog();">&#9823; New Game</button>
+        <button class="btn" onclick="closeDialog(DOM.resultOverlay);">Review</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIALOG — FEN Input -->
+  <div id="fenOverlay" class="confirm-overlay hidden" role="dialog" aria-modal="true" aria-label="Load position from FEN">
+    <div class="confirm-dialog">
+      <h3>Load Position</h3>
+      <p>Paste a FEN string to set up a custom position:</p>
+      <input type="text" id="fenInput" class="fen-input" placeholder="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" spellcheck="false" autocomplete="off">
+      <p class="fen-error hidden" id="fenError">Invalid FEN string.</p>
+      <div class="confirm-actions">
+        <button class="btn btn-primary" onclick="loadFEN()">Load</button>
+        <button class="btn" onclick="hideFENDialog()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIALOG — PGN Import -->
+  <div id="pgnOverlay" class="confirm-overlay hidden" role="dialog" aria-modal="true" aria-label="Import game from PGN">
+    <div class="confirm-dialog">
+      <h3>Import PGN</h3>
+      <p>Paste a PGN to load and review a game:</p>
+      <textarea id="pgnInput" class="pgn-input" rows="6" placeholder="1. e4 e5 2. Nf3 Nc6..." spellcheck="false"></textarea>
+      <p class="fen-error hidden" id="pgnError">Could not parse PGN.</p>
+      <div class="confirm-actions">
+        <button class="btn btn-primary" onclick="importPGN()">Import</button>
+        <button class="btn" onclick="hidePGNDialog()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN ARENA -->
+  <main class="arena">
+
+    <!-- Status bar -->
+    <div class="status-bar" id="statusBar" role="status" aria-live="polite">
+      <div class="status-icon" aria-hidden="true"></div>
+      <span class="status-text" id="statusText">Choose a color to begin</span>
+      <span class="turn-badge" id="turnBadge">—</span>
+    </div>
+    <div class="opening-name" id="openingName"></div>
+
+    <!-- Captured pieces (top - opponent) + clock -->
+    <div class="captured-pieces">
+      <div class="captured-group" id="capturedByBlack"></div>
+      <span class="captured-advantage" id="blackAdvantage"></span>
+      <span class="clock" id="clockTop" aria-label="Opponent clock"></span>
+    </div>
+
+    <!-- Chessboard + Evaluation bar -->
+    <div class="board-eval-wrapper">
+      <div class="eval-container" aria-label="Position evaluation">
+        <div class="eval-bar-fill" id="evalBarFill"></div>
+        <span class="eval-label eval-label-top" id="evalLabelTop"></span>
+        <span class="eval-label eval-label-bottom" id="evalLabelBottom"></span>
+      </div>
+      <div id="board-container">
+        <div id="board"></div>
+        <svg id="arrowOverlay" class="arrow-overlay"></svg>
+        <div id="engineLoading" class="engine-loading hidden">
+          <div class="engine-spinner"></div>
+          <span>Loading engine...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Captured pieces (bottom - player) + clock -->
+    <div class="captured-pieces">
+      <div class="captured-group" id="capturedByWhite"></div>
+      <span class="captured-advantage" id="whiteAdvantage"></span>
+      <span class="clock" id="clockBottom" aria-label="Player clock"></span>
+    </div>
+
+    <!-- AI thinking indicator -->
+    <div class="thinking" id="thinking" aria-live="polite">
+      <div class="thinking-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+      <span>Stockfish is thinking...</span>
+    </div>
+
+    <!-- Control buttons -->
+    <div class="controls">
+      <button class="btn btn-primary" id="btnNewGame" onclick="showColorDialog()" aria-label="New game">
+        &#9823; New Game
+      </button>
+      <button class="btn" id="btnUndo" onclick="undoMove()" aria-label="Undo move" disabled>
+        &#8617; Undo
+      </button>
+      <button class="btn" id="btnExport" onclick="exportPGN()" aria-label="Export PGN">
+        &#9776; Export
+      </button>
+      <button class="btn" id="btnImport" onclick="showPGNDialog()" aria-label="Import PGN">
+        &#8615; Import
+      </button>
+      <button class="btn" id="btnFEN" onclick="showFENDialog()" aria-label="Load FEN position">
+        &#9881; FEN
+      </button>
+      <button class="btn" id="btnPuzzle" onclick="loadPuzzle()" aria-label="Daily puzzle">
+        &#9733; Puzzle
+      </button>
+      <button class="btn" id="btnAnalyze" onclick="startAnalysis()" aria-label="Analyze game" disabled>
+        &#9878; Analyze
+      </button>
+      <button class="btn" id="btnDraw" onclick="offerDraw()" aria-label="Offer draw" disabled>
+        &#189; Draw
+      </button>
+      <button class="btn btn-danger" id="btnResign" onclick="resignGame()" aria-label="Resign" disabled>
+        &#9873; Resign
+      </button>
+    </div>
+
+    <!-- Toolbar: flip + sound + theme + board theme -->
+    <div class="toolbar">
+      <button class="toolbar-btn" id="btnFlip" onclick="flipBoard()" aria-label="Flip board">&#8693; Flip</button>
+      <button class="toolbar-btn" id="btnHints" aria-label="Toggle hints">&#10148; Hints</button>
+      <button class="toolbar-btn active" id="btnSound" aria-label="Toggle sound">&#9834; Sound</button>
+      <button class="toolbar-btn" id="btnTheme" aria-label="Toggle theme">&#9790; Dark</button>
+      <button class="toolbar-btn" id="btnBoardTheme" aria-label="Change board colors">&#9638; Board</button>
+    </div>
+
+    <!-- Move history -->
+    <div class="history-panel">
+      <div class="history-header">
+        <div class="history-title">Move History</div>
+        <div class="history-nav" id="historyNav">
+          <button class="nav-btn" id="navFirst" onclick="navFirst()" title="First move" aria-label="First move">&#8676;</button>
+          <button class="nav-btn" id="navPrev" onclick="navPrev()" title="Previous move" aria-label="Previous move">&#8592;</button>
+          <button class="nav-btn" id="navNext" onclick="navNext()" title="Next move" aria-label="Next move">&#8594;</button>
+          <button class="nav-btn" id="navLast" onclick="navLast()" title="Last move" aria-label="Last move">&#8677;</button>
+        </div>
+      </div>
+      <div class="history-moves" id="moveHistory">—</div>
+    </div>
+
+    <!-- Game history archive -->
+    <div class="game-archive" id="gameArchive">
+      <div class="history-header">
+        <div class="history-title">Past Games</div>
+        <button class="nav-btn" onclick="clearGameArchive()" title="Clear history">Clear</button>
+      </div>
+      <div class="archive-list" id="archiveList">
+        <p class="archive-empty">No completed games yet.</p>
+      </div>
+    </div>
+
+    <!-- Player Statistics -->
+    <div class="stats-panel" id="statsPanel">
+      <div class="history-header">
+        <div class="history-title">Statistics</div>
+        <button class="nav-btn" onclick="resetStats()" title="Reset stats">Reset</button>
+      </div>
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-item"><span class="stat-value" id="statGames">0</span><span class="stat-label">Games</span></div>
+        <div class="stat-item"><span class="stat-value stat-win" id="statWins">0</span><span class="stat-label">Wins</span></div>
+        <div class="stat-item"><span class="stat-value stat-loss" id="statLosses">0</span><span class="stat-label">Losses</span></div>
+        <div class="stat-item"><span class="stat-value" id="statDraws">0</span><span class="stat-label">Draws</span></div>
+        <div class="stat-item"><span class="stat-value" id="statWinRate">0%</span><span class="stat-label">Win Rate</span></div>
+        <div class="stat-item"><span class="stat-value" id="statStreak">0</span><span class="stat-label">Best Streak</span></div>
+      </div>
+    </div>
+
+    <!-- Keyboard shortcuts hint -->
+    <div class="shortcuts-hint">
+      <kbd>N</kbd> New Game &nbsp; <kbd>U</kbd> Undo &nbsp; <kbd>R</kbd> Resign &nbsp; <kbd>E</kbd> Export PGN &nbsp; <kbd>F</kbd> Flip
+    </div>
+
+  </main>
+
+  <footer>
+    Chess Arena — Stockfish WASM &middot; chessboard.js &middot; chess.js
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="js/app.js"></script>
+  <script src="js/stockfish.js"></script>
+  <script src="js/board.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/puzzles.js"></script>
+
+</body>
+</html>

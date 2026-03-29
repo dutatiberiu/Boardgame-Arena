@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkers — Board Game Arena</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <div class="page">
+
+    <a href="../index.html" class="back-link">← Board Game Arena</a>
+
+    <header>
+      <div class="ornament">
+        <div class="ornament-line"></div>
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line"></div>
+      </div>
+      <h1>Checkers</h1>
+      <p class="subtitle">You vs AI</p>
+    </header>
+
+    <!-- Color + Difficulty Dialog -->
+    <div id="colorOverlay" class="overlay visible">
+      <div class="dialog">
+        <h2>Choose Your Color</h2>
+        <p>Which pieces do you want to play?</p>
+
+        <div class="color-options">
+          <button class="color-btn" onclick="startGame('light')">
+            <div class="swatch" style="background:var(--checker-light)"></div>
+            LIGHT
+          </button>
+          <button class="color-btn" onclick="startGame('dark')">
+            <div class="swatch" style="background:var(--checker-dark)"></div>
+            DARK
+          </button>
+        </div>
+
+        <div class="dialog-label">Difficulty</div>
+        <div class="difficulty-row">
+          <button class="diff-btn" data-diff="easy"   onclick="setDifficulty('easy')">Easy</button>
+          <button class="diff-btn" data-diff="medium" onclick="setDifficulty('medium')">Medium</button>
+          <button class="diff-btn active" data-diff="hard"   onclick="setDifficulty('hard')">Hard</button>
+          <button class="diff-btn" data-diff="expert" onclick="setDifficulty('expert')">Expert</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar" id="statusBar">
+      <div class="status-icon"></div>
+      <span id="statusText">Choose a color to start</span>
+      <span class="turn-badge" id="turnBadge">—</span>
+    </div>
+
+    <!-- Board -->
+    <div class="board-frame">
+      <div class="board" id="board"></div>
+    </div>
+
+    <!-- Thinking Indicator -->
+    <div class="thinking" id="thinking">
+      <div class="thinking-dots"><span></span><span></span><span></span></div>
+      <span>AI is thinking...</span>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn btn-primary" onclick="showColorDialog()">↻ New Game</button>
+      <button class="btn" id="undoBtn" onclick="undoMove()" disabled>↩ Undo</button>
+      <button class="btn btn-danger" onclick="resignGame()">⚐ Resign</button>
+      <button class="btn" onclick="resetScores()">✕ Reset Score</button>
+    </div>
+
+    <!-- Scoreboard -->
+    <div class="scoreboard">
+      <div class="score-side">
+        <div class="score-label">You — Wins</div>
+        <div class="score-main" id="scorePlayer">0</div>
+        <div class="score-sub">Pieces: <span id="piecesPlayer">12</span></div>
+      </div>
+      <div class="score-center">
+        <div class="score-label">Captured</div>
+        <div class="score-main" style="font-size:1rem" id="captured">0 — 0</div>
+      </div>
+      <div class="score-side">
+        <div class="score-label">AI — Wins</div>
+        <div class="score-main" id="scoreAI">0</div>
+        <div class="score-sub">Pieces: <span id="piecesAI">12</span></div>
+      </div>
+    </div>
+
+    <footer>Board Game Arena — Checkers · Minimax AI · Alpha-Beta Pruning</footer>
+
+  </div>
+
+  <script src="js/ai.js"></script>
+  <script src="js/game.js"></script>
+
+</body>
+</html>

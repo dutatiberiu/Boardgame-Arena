@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Play backgammon against an AI opponent in your browser — featuring full-turn AI, doubling cube, match play and statistics.">
+  <title>Backgammon Arena</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <header>
+    <nav class="arena-nav">
+      <a href="../index.html" class="arena-nav-link">← Board Game Arena</a>
+    </nav>
+    <h1>⚂ Backgammon Arena</h1>
+    <p>You vs. Computer</p>
+  </header>
+
+  <!-- =========================================================
+       DIALOG — Choose color + difficulty + match length
+       ========================================================= -->
+  <div id="colorOverlay" class="overlay visible" role="dialog" aria-modal="true" aria-label="New game options">
+    <div class="dialog">
+      <h2>New Game</h2>
+      <p>Choose your color and difficulty</p>
+
+      <!-- Color buttons -->
+      <div class="color-options">
+        <button class="color-btn" id="chooseWhiteBtn" aria-label="Play as White">
+          <div class="swatch" style="background:#f0e4cc"></div>
+          WHITE
+        </button>
+        <button class="color-btn" id="chooseBlackBtn" aria-label="Play as Black">
+          <div class="swatch" style="background:#2a2235"></div>
+          BLACK
+        </button>
+      </div>
+
+      <!-- Difficulty -->
+      <div style="margin-bottom:.4rem">
+        <div class="score-label" style="margin-bottom:.4rem">Difficulty</div>
+        <div class="difficulty-row">
+          <button class="diff-btn" data-diff="easy"   aria-pressed="false">Easy</button>
+          <button class="diff-btn active" data-diff="medium" aria-pressed="true">Medium</button>
+          <button class="diff-btn" data-diff="hard"   aria-pressed="false">Hard</button>
+          <button class="diff-btn" data-diff="expert" aria-pressed="false">Expert</button>
+        </div>
+      </div>
+
+      <!-- Match length -->
+      <div>
+        <div class="score-label" style="margin-bottom:.4rem">Match</div>
+        <div class="match-row">
+          <button class="match-btn active" data-match="0" aria-pressed="true">Single</button>
+          <button class="match-btn" data-match="3" aria-pressed="false">3 pts</button>
+          <button class="match-btn" data-match="5" aria-pressed="false">5 pts</button>
+          <button class="match-btn" data-match="7" aria-pressed="false">7 pts</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       DIALOG — Resign confirmation
+       ========================================================= -->
+  <div id="confirmOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Confirm resign">
+    <div class="dialog">
+      <h2>Resign?</h2>
+      <p class="confirm-text">Are you sure you want to resign? AI will win the game.</p>
+      <div class="dialog-buttons">
+        <button class="btn btn-danger" id="confirmResignBtn">Yes, Resign</button>
+        <button class="btn" id="cancelResignBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       DIALOG — Result / game over
+       ========================================================= -->
+  <div id="resultOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Game result">
+    <div class="dialog">
+      <div class="result-icon" id="resultIcon" aria-hidden="true">🏆</div>
+      <h2 id="resultTitle">You Win!</h2>
+      <p id="resultDetail" class="result-detail"></p>
+      <p id="resultStakes" class="result-detail" style="color:var(--accent);font-weight:600"></p>
+      <div class="dialog-buttons" style="margin-top:1.2rem">
+        <button class="btn btn-primary" id="resultNewGameBtn">New Game</button>
+        <button class="btn" id="resultCloseBtn">Review</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       DIALOG — Doubling cube offer
+       ========================================================= -->
+  <div id="doubleOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Doubling cube offer">
+    <div class="dialog">
+      <h2 id="doubleDialogTitle">Double?</h2>
+      <p id="doubleDialogDesc">Offer to raise the cube?</p>
+      <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:.5rem 0 1rem">
+        <span class="cube-value" id="doubleFromText">1</span>
+        <span style="color:var(--text-muted)">→</span>
+        <span class="cube-value" id="doubleToText" style="color:var(--accent-hover)">2</span>
+      </div>
+      <div class="dialog-buttons">
+        <button class="btn btn-primary" id="acceptDoubleBtn">Accept</button>
+        <button class="btn btn-danger"  id="declineDoubleBtn">Decline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MAIN ARENA
+       ========================================================= -->
+  <main class="arena">
+
+    <!-- Status bar -->
+    <div class="status-bar" id="statusBar" role="status" aria-live="polite">
+      <div class="status-icon" aria-hidden="true"></div>
+      <span id="statusText">Choose a color to start</span>
+      <span class="turn-badge" id="turnBadge" aria-label="Current turn">—</span>
+    </div>
+
+    <!-- Match score (shown in match play mode) -->
+    <div class="match-score-bar" id="matchScoreBar" aria-label="Match score">
+      <span class="match-player">You</span>
+      <span class="match-pts" id="matchPlayerPts">0</span>
+      <span class="match-vs">·</span>
+      <span id="matchLengthTxt" style="font-size:.7rem;color:var(--text-muted)">First to 5</span>
+      <span class="match-vs">·</span>
+      <span class="match-pts" id="matchAIPts">0</span>
+      <span class="match-player">AI</span>
+    </div>
+
+    <!-- Canvas board -->
+    <canvas id="boardCanvas" width="720" height="480"
+      aria-label="Backgammon board"
+      role="img"></canvas>
+
+    <!-- Dice area: shows Roll button OR the actual dice -->
+    <div class="dice-row" id="diceRow" aria-label="Dice" aria-live="polite">
+      <button class="btn btn-primary btn-roll-inline" id="btnRoll" style="display:none" aria-label="Roll dice">🎲 Roll Dice</button>
+    </div>
+    <div class="thinking" id="thinking" aria-live="polite" aria-label="AI thinking">
+      <div class="thinking-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+      <span>AI is thinking...</span>
+    </div>
+
+    <!-- Primary controls -->
+    <div class="controls">
+      <button class="btn" id="btnDouble" disabled aria-label="Offer doubling cube">⬛ Double</button>
+      <button class="btn" id="btnUndo" aria-label="Undo last turn">↩ Undo</button>
+      <button class="btn" id="btnNewGame" aria-label="Start new game">♟ New Game</button>
+      <button class="btn btn-danger" id="btnResign" aria-label="Resign game">⚐ Resign</button>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar" role="toolbar" aria-label="Settings">
+      <button class="toolbar-btn active" id="btnSound"      aria-label="Toggle sound">🔊 Sound</button>
+      <button class="toolbar-btn"        id="btnTheme"      aria-label="Toggle light/dark theme">🌙 Theme</button>
+      <button class="toolbar-btn"        id="btnBoardTheme" aria-label="Cycle board theme">🎨 Board</button>
+    </div>
+
+    <!-- Score panel -->
+    <div class="score-panel" aria-label="Game statistics">
+      <div class="score-item">
+        <div class="score-label">You — Off</div>
+        <div class="score-value" id="scorePlayer">0</div>
+      </div>
+      <div class="score-item">
+        <div class="score-label">Your Pips</div>
+        <div class="score-value" id="pipPlayer">167</div>
+      </div>
+      <div class="score-item">
+        <div class="score-label">AI Pips</div>
+        <div class="score-value" id="pipAI">167</div>
+      </div>
+      <div class="score-item">
+        <div class="score-label">AI — Off</div>
+        <div class="score-value" id="scoreAI">0</div>
+      </div>
+    </div>
+
+    <!-- Move history panel -->
+    <div class="history-panel">
+      <div class="history-header">
+        <span>Move History</span>
+      </div>
+      <div class="history-moves" id="moveHistoryMoves" aria-live="polite">
+        <span style="color:var(--text-muted);font-size:.75rem">No moves yet</span>
+      </div>
+      <div class="history-nav" role="group" aria-label="Navigate moves">
+        <button class="nav-btn" id="navFirst" title="First position"  aria-label="Go to first position"  disabled>⏮</button>
+        <button class="nav-btn" id="navPrev"  title="Previous move"   aria-label="Previous move"          disabled>◀</button>
+        <button class="nav-btn" id="navNext"  title="Next move"       aria-label="Next move"              disabled>▶</button>
+        <button class="nav-btn" id="navLast"  title="Latest position" aria-label="Go to latest position"  disabled>⏭</button>
+      </div>
+    </div>
+
+    <!-- Game archive -->
+    <div class="archive-panel">
+      <div class="archive-header">
+        <span>Recent Games</span>
+        <button class="toolbar-btn" id="clearArchiveBtn" style="font-size:.65rem;padding:.25rem .55rem" aria-label="Clear game archive">Clear</button>
+      </div>
+      <div class="archive-list" id="archiveList">
+        <div class="archive-empty">No games yet</div>
+      </div>
+    </div>
+
+    <!-- Statistics panel -->
+    <div class="stats-panel">
+      <div class="stats-header">
+        <span>Statistics</span>
+        <button class="toolbar-btn" id="resetStatsBtn" style="font-size:.65rem;padding:.25rem .55rem" aria-label="Reset statistics">Reset</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-item"><div class="stat-label">Games</div>   <div class="stat-value" id="statGames">0</div></div>
+        <div class="stat-item"><div class="stat-label">Wins</div>    <div class="stat-value" id="statWins">0</div></div>
+        <div class="stat-item"><div class="stat-label">Losses</div>  <div class="stat-value" id="statLosses">0</div></div>
+        <div class="stat-item"><div class="stat-label">Win %</div>   <div class="stat-value" id="statRate">0%</div></div>
+        <div class="stat-item"><div class="stat-label">Gammons</div> <div class="stat-value" id="statGammons">0</div></div>
+        <div class="stat-item"><div class="stat-label">Bgammons</div><div class="stat-value" id="statBgammons">0</div></div>
+        <div class="stat-item"><div class="stat-label">Streak</div>  <div class="stat-value" id="statCurStreak">0</div></div>
+        <div class="stat-item"><div class="stat-label">Best</div>    <div class="stat-value" id="statStreak">0</div></div>
+      </div>
+    </div>
+
+    <!-- Keyboard shortcuts hint -->
+    <div class="shortcuts-hint" aria-label="Keyboard shortcuts">
+      <span><kbd>N</kbd> New</span>
+      <span><kbd>R</kbd> Roll</span>
+      <span><kbd>U</kbd> Undo</span>
+      <span><kbd>D</kbd> Double</span>
+      <span><kbd>←</kbd><kbd>→</kbd> History</span>
+      <span><kbd>Esc</kbd> Deselect</span>
+    </div>
+
+  </main>
+
+  <footer>Backgammon Arena — Pure HTML/CSS/JS · Canvas Rendering · Zero Backend</footer>
+
+  <!-- Scripts — load order matters: app → board → ai → game -->
+  <script src="js/app.js"></script>
+  <script src="js/board.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/game.js"></script>
+
+</body>
+</html>

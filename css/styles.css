@@ -1,0 +1,552 @@
+/* ============================================================
+   DESIGN SYSTEM — The Grand Study
+   Dark mahogany + brass/gold + cream + deep shadows
+   ============================================================ */
+:root {
+  --bg-deep: #0a0704;
+  --bg-primary: #0f0b08;
+  --bg-card: #1a130d;
+  --bg-card-hover: #231a12;
+  --bg-elevated: #2a1f15;
+  --border: #3d3020;
+  --border-light: #4a3a28;
+  --text-primary: #e8dcc8;
+  --text-secondary: #a89878;
+  --text-muted: #6a5a42;
+  --gold: #c89b3c;
+  --gold-light: #ddb04a;
+  --gold-pale: #f0d78c;
+  --gold-glow: rgba(200,155,60,.12);
+  --gold-glow-strong: rgba(200,155,60,.25);
+  --burgundy: #7d2e2e;
+  --burgundy-light: #a04040;
+  --cream: #e8dcc8;
+  --wood-light: #6b4e2e;
+  --wood-dark: #3d3425;
+  --felt: #2a3a28;
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-body: 'DM Sans', -apple-system, sans-serif;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --shadow: 0 8px 40px rgba(0,0,0,.6);
+  --shadow-gold: 0 0 60px rgba(200,155,60,.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   GRAIN TEXTURE
+   ============================================================ */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0;
+}
+
+/* ============================================================
+   DECORATIVE BORDER LINE
+   ============================================================ */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--gold) 20%,
+    var(--gold-pale) 50%,
+    var(--gold) 80%,
+    transparent 100%
+  );
+  z-index: 10;
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.page {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 0 1.25rem;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+header {
+  text-align: center;
+  padding: 4rem 0 1rem;
+  width: 100%;
+  max-width: 800px;
+}
+
+.ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 1.5rem;
+}
+
+.ornament-line {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.ornament-diamond {
+  width: 8px; height: 8px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 6vw, 3.2rem);
+  letter-spacing: .06em;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-pale) 40%, var(--gold) 70%, var(--gold-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  color: var(--text-muted);
+  font-size: .85rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-top: .6rem;
+  font-weight: 500;
+}
+
+/* ============================================================
+   GAME CARDS GRID
+   ============================================================ */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 2.5rem 0 3rem;
+}
+
+/* ============================================================
+   GAME CARD
+   ============================================================ */
+.game-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .4s cubic-bezier(.22,1,.36,1),
+              border-color .4s,
+              box-shadow .4s;
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.game-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--gold);
+  box-shadow: var(--shadow), var(--shadow-gold), 0 0 80px rgba(200,155,60,.1);
+}
+
+.game-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, var(--gold-glow) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity .4s;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.game-card:hover::before { opacity: 1; }
+
+/* ============================================================
+   CARD — Preview area
+   ============================================================ */
+.card-preview {
+  position: relative;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.chess-preview {
+  background: linear-gradient(135deg, #1a130d 0%, #231a12 100%);
+}
+
+.chess-board-mini {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  width: 160px; height: 160px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 6px 30px rgba(0,0,0,.5);
+  transform: perspective(600px) rotateX(12deg) rotateZ(-2deg);
+  transition: transform .5s cubic-bezier(.22,1,.36,1);
+}
+
+.game-card:hover .chess-board-mini {
+  transform: perspective(600px) rotateX(4deg) rotateZ(0deg) scale(1.05);
+}
+
+.chess-sq {
+  aspect-ratio: 1;
+}
+
+.chess-sq.light { background: var(--cream); }
+.chess-sq.dark { background: var(--wood-light); }
+
+.chess-sq .piece {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  user-select: none;
+}
+
+.backgammon-preview {
+  background: linear-gradient(135deg, #12100a 0%, #1e1810 100%);
+}
+
+.bg-board-mini {
+  width: 200px; height: 130px;
+  background: var(--wood-dark);
+  border-radius: 8px;
+  border: 3px solid var(--wood-light);
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  box-shadow: 0 6px 30px rgba(0,0,0,.5);
+  transform: perspective(600px) rotateX(10deg);
+  transition: transform .5s cubic-bezier(.22,1,.36,1);
+  overflow: hidden;
+}
+
+.game-card:hover .bg-board-mini {
+  transform: perspective(600px) rotateX(3deg) scale(1.05);
+}
+
+.bg-half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.bg-points-row {
+  display: flex;
+  gap: 2px;
+}
+
+.bg-point {
+  flex: 1;
+  height: 40px;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.bg-point.up { clip-path: polygon(0 100%, 100% 100%, 50% 0); }
+
+.bg-point.t1 { background: var(--gold); opacity: .7; }
+.bg-point.t2 { background: var(--wood-light); }
+
+.bg-bar {
+  width: 12px;
+  background: #1a130d;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.bg-checker-row {
+  display: flex; gap: 2px; justify-content: center;
+  position: absolute;
+}
+.bg-ck {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+.bg-ck.w { background: var(--cream); box-shadow: inset 0 1px 2px rgba(0,0,0,.2); }
+.bg-ck.b { background: #2a2235; box-shadow: inset 0 1px 2px rgba(0,0,0,.3); }
+
+/* ============================================================
+   CARD — Content area
+   ============================================================ */
+.card-content {
+  position: relative;
+  z-index: 2;
+  padding: 1.5rem 1.5rem 1.75rem;
+  text-align: center;
+}
+
+.card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .65rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: .6rem;
+  padding: .3rem .7rem;
+  background: rgba(200,155,60,.08);
+  border: 1px solid rgba(200,155,60,.15);
+  border-radius: 6px;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: .04em;
+  color: var(--text-primary);
+  margin-bottom: .4rem;
+}
+
+.card-desc {
+  color: var(--text-secondary);
+  font-size: .88rem;
+  line-height: 1.6;
+  margin-bottom: 1.2rem;
+}
+
+.card-features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .4rem;
+  margin-bottom: 1.2rem;
+}
+
+.feature-tag {
+  font-size: .7rem;
+  padding: .25rem .6rem;
+  border-radius: 5px;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  letter-spacing: .02em;
+}
+
+.card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-family: var(--font-body);
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: .04em;
+  transition: gap .3s;
+}
+
+.game-card:hover .card-cta {
+  gap: .8rem;
+}
+
+.cta-arrow {
+  display: inline-block;
+  transition: transform .3s;
+}
+.game-card:hover .cta-arrow { transform: translateX(4px); }
+
+/* ============================================================
+   BOTTOM ORNAMENT
+   ============================================================ */
+.bottom-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 1rem;
+}
+
+.bo-line {
+  width: 80px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+
+.bo-text {
+  font-family: var(--font-display);
+  font-size: .7rem;
+  letter-spacing: .2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  text-align: center;
+  padding: 1rem;
+  color: var(--text-muted);
+  font-size: .72rem;
+  letter-spacing: .05em;
+}
+
+footer a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+/* ============================================================
+   ENTRANCE ANIMATIONS
+   ============================================================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+header {
+  animation: fadeUp .8s ease-out both;
+}
+
+.game-card:nth-child(1) {
+  animation: fadeUp .8s ease-out .2s both;
+}
+
+.game-card:nth-child(2) {
+  animation: fadeUp .8s ease-out .35s both;
+}
+
+.game-card:nth-child(3) {
+  animation: fadeUp .8s ease-out .5s both;
+}
+
+.game-card:nth-child(4) {
+  animation: fadeUp .8s ease-out .65s both;
+}
+
+.bottom-ornament {
+  animation: fadeUp .6s ease-out .5s both;
+}
+
+/* ============================================================
+   TIC TAC TOE PREVIEW
+   ============================================================ */
+.ttt-preview {
+  background: linear-gradient(135deg, #1a130d 0%, #231a12 100%);
+}
+
+.ttt-board-mini {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 120px; height: 120px;
+  gap: 3px;
+  background: var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 6px 30px rgba(0,0,0,.5);
+  transform: perspective(600px) rotateX(12deg) rotateZ(2deg);
+  transition: transform .5s cubic-bezier(.22,1,.36,1);
+}
+
+.game-card:hover .ttt-board-mini {
+  transform: perspective(600px) rotateX(4deg) rotateZ(0deg) scale(1.05);
+}
+
+.ttt-cell {
+  background: var(--bg-card-hover);
+  display: flex; align-items: center; justify-content: center;
+  user-select: none;
+}
+
+.ttt-cell.ttt-x::after {
+  content: '✕';
+  color: var(--gold);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ttt-cell.ttt-o::after {
+  content: '◯';
+  color: var(--cream);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* ============================================================
+   CHECKERS PREVIEW
+   ============================================================ */
+.checkers-preview {
+  background: linear-gradient(135deg, #12100a 0%, #1e1810 100%);
+}
+
+.checkers-board-mini {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  width: 160px; height: 160px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 6px 30px rgba(0,0,0,.5);
+  transform: perspective(600px) rotateX(12deg) rotateZ(-2deg);
+  transition: transform .5s cubic-bezier(.22,1,.36,1);
+}
+
+.game-card:hover .checkers-board-mini {
+  transform: perspective(600px) rotateX(4deg) rotateZ(0deg) scale(1.05);
+}
+
+.ck-sq {
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.ck-sq.light { background: #d4c4a0; }
+.ck-sq.dark  { background: #6b4e2e; }
+
+.ck-piece {
+  width: 68%; height: 68%;
+  border-radius: 50%;
+}
+
+.ck-piece.lp {
+  background: radial-gradient(circle at 35% 35%, #fff, #f0e4cc 60%, #c8b89a);
+  border: 1px solid #c8b89a;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+
+.ck-piece.dp {
+  background: radial-gradient(circle at 35% 35%, #4a3f55, #2a2235 60%, #3d3350);
+  border: 1px solid #3d3350;
+  box-shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 680px) {
+  header { padding: 3rem 0 .5rem; }
+  .games-grid { gap: 1.2rem; margin: 2rem 0; }
+  .card-preview { height: 180px; }
+  .card-content { padding: 1.2rem 1.2rem 1.5rem; }
+}
