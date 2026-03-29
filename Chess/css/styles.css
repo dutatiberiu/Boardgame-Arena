@@ -211,6 +211,15 @@ body > .piece-417db {
   background-color: #c89b3c44 !important;
 }
 
+/* Click-to-move */
+.click-selected {
+  background-color: #c89b3c66 !important;
+}
+.click-target {
+  background: radial-gradient(circle, var(--highlight) 25%, transparent 25%) !important;
+  cursor: pointer;
+}
+
 .highlight-premove {
   background-color: rgba(91, 143, 217, 0.4) !important;
 }

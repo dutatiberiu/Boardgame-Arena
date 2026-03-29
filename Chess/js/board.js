@@ -5,10 +5,87 @@
 /* Pending promotion state */
 let pendingPromotion = null;  // { source, target }
 
+/* Click-to-move state */
+let selectedSquare = null;
+
+function selectSquare(square) {
+  clearClickHighlights();
+  selectedSquare = square;
+
+  const el = document.querySelector(`.square-${square}`);
+  if (el) el.classList.add('click-selected');
+
+  game.moves({ square, verbose: true }).forEach(m => {
+    const targetEl = document.querySelector(`.square-${m.to}`);
+    if (targetEl) targetEl.classList.add('click-target');
+  });
+}
+
+function clearClickHighlights() {
+  document.querySelectorAll('.click-selected, .click-target').forEach(el => {
+    el.classList.remove('click-selected', 'click-target');
+  });
+  selectedSquare = null;
+}
+
+function isOwnPiece(piece) {
+  if (!piece) return false;
+  return (playerColor === 'white' && piece.startsWith('w')) ||
+         (playerColor === 'black' && piece.startsWith('b'));
+}
+
+function onSquareClick(square, piece) {
+  if (!gameActive || isViewingHistory()) return;
+  if (aiThinking) return;
+
+  const isPlayerTurn = (playerColor === 'white' && game.turn() === 'w') ||
+                       (playerColor === 'black' && game.turn() === 'b');
+
+  if (selectedSquare) {
+    const moves = game.moves({ square: selectedSquare, verbose: true });
+    const target = moves.find(m => m.to === square);
+
+    if (target) {
+      const from = selectedSquare;
+      clearClickHighlights();
+
+      if (isPromotionMove(from, square)) {
+        pendingPromotion = { source: from, target: square };
+        board.position(game.fen());
+        showPromotionDialog(from, square);
+        return;
+      }
+
+      const move = game.move({ from, to: square, promotion: 'q' });
+      if (move) {
+        board.position(game.fen(), false);
+        afterPlayerMove(move, from, square);
+      }
+      return;
+    }
+
+    // Clicked another own piece — switch selection
+    if (isPlayerTurn && isOwnPiece(piece)) {
+      selectSquare(square);
+      return;
+    }
+
+    // Clicked elsewhere — deselect
+    clearClickHighlights();
+    return;
+  }
+
+  // Nothing selected — select own piece
+  if (isPlayerTurn && isOwnPiece(piece)) {
+    selectSquare(square);
+  }
+}
+
 /**
  * onDragStart — Verifică dacă piesa poate fi mutată.
  */
 function onDragStart(source, piece, position, orientation) {
+  clearClickHighlights();
   if (!gameActive) return false;
   if (game.game_over()) return false;
   if (isViewingHistory()) return false;
@@ -185,9 +262,10 @@ function highlightSquare(square) {
 }
 
 function removeHighlights() {
-  document.querySelectorAll('.highlight-source, .highlight-legal').forEach(el => {
-    el.classList.remove('highlight-source', 'highlight-legal');
+  document.querySelectorAll('.highlight-source, .highlight-legal, .click-selected, .click-target').forEach(el => {
+    el.classList.remove('highlight-source', 'highlight-legal', 'click-selected', 'click-target');
   });
+  selectedSquare = null;
 }
 
 /**

@@ -88,6 +88,7 @@ function createBoard(options) {
     config.onSnapEnd = onSnapEnd;
     config.onMouseoverSquare = onMouseoverSquare;
     config.onMouseoutSquare = onMouseoutSquare;
+    config.onSquareClick = onSquareClick;
   }
 
   if (board) board.destroy();
