@@ -2,7 +2,7 @@
 
 A collection of classic board games playable directly in the browser — no installation, no backend, no dependencies to install. Just open and play.
 
-**Live demo:** ==> 
+**Live demo:** ==> https://dutatiberiu.github.io/Boardgame-Arena/
 
 ---
 
