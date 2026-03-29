@@ -103,10 +103,13 @@ function updateMoveHistory() {
   }
 
   container.innerHTML = html;
-  // Scroll to show active move
+  // Scroll container to show active move (without scrolling the page)
   const activeEl = container.querySelector('.active');
-  if (activeEl) activeEl.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-  else container.scrollLeft = container.scrollWidth;
+  if (activeEl) {
+    container.scrollLeft = activeEl.offsetLeft - container.clientWidth / 2 + activeEl.clientWidth / 2;
+  } else {
+    container.scrollLeft = container.scrollWidth;
+  }
 }
 
 /* ===========================================================
