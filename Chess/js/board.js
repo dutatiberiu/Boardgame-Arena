@@ -110,7 +110,26 @@ function initCustomDrag() {
   const boardEl = document.getElementById('board');
   if (!boardEl) return;
 
-  boardEl.addEventListener('mousedown', function(e) {
+  // Use pointer events: handles both mouse and touch uniformly.
+  //
+  // Strategy for tap vs drag:
+  //   - pointerdown: e.preventDefault() prevents iOS layout shifts/scroll.
+  //     This also suppresses the browser's native 'click' event on mobile.
+  //   - pointerup with no drag: we manually dispatch the click handler so
+  //     click-to-move still works despite no native click event firing.
+  //   - _justDragged is set AFTER our manual dispatch, suppressing any
+  //     late-firing native click on desktop (where click still fires).
+  //   - Empty squares / opponent pieces: pointerdown returns early (no
+  //     preventDefault), so native click fires normally for those.
+
+  boardEl.addEventListener('pointerdown', function(e) {
+    if (e.pointerType === 'mouse' && e.button !== 0) return; // left-click only
+
+    // Always clear stale _justDragged here — before any early returns.
+    // This prevents a flag set by a previous tap-on-piece from blocking
+    // the native click that fires when the user taps an empty target square.
+    _justDragged = false;
+
     if (!gameActive) return;
     if (isViewingHistory()) return;
 
@@ -122,11 +141,9 @@ function initCustomDrag() {
 
     const pieceIsPlayer = (playerColor === 'white' && p.color === 'w') ||
                           (playerColor === 'black' && p.color === 'b');
+    const isPlayerTurn  = (playerColor === 'white' && game.turn() === 'w') ||
+                          (playerColor === 'black' && game.turn() === 'b');
 
-    const isPlayerTurn = (playerColor === 'white' && game.turn() === 'w') ||
-                         (playerColor === 'black' && game.turn() === 'b');
-
-    // Allow mousedown for premove (AI thinking) or normal turn
     if (!pieceIsPlayer) return;
     if (!isPlayerTurn && !aiThinking) return;
 
@@ -134,10 +151,10 @@ function initCustomDrag() {
     _dragStartX = e.clientX;
     _dragStartY = e.clientY;
     _dragActive = false;
-    e.preventDefault();
+    e.preventDefault(); // prevent iOS scroll/reflow on touch
   });
 
-  document.addEventListener('mousemove', function(e) {
+  document.addEventListener('pointermove', function(e) {
     if (!_dragSource) return;
 
     const dx = e.clientX - _dragStartX;
@@ -145,14 +162,13 @@ function initCustomDrag() {
 
     if (!_dragActive && Math.sqrt(dx * dx + dy * dy) > 6) {
       _dragActive = true;
+      e.preventDefault();
       clearClickHighlights();
 
-      // Find the piece image in the source square and fade it
       const sqEl = document.querySelector(`.square-${_dragSource}`);
       _dragImgEl = sqEl ? sqEl.querySelector('img') : null;
       if (_dragImgEl) _dragImgEl.style.opacity = '0.25';
 
-      // Create ghost
       if (_dragImgEl) {
         _dragGhost = document.createElement('img');
         _dragGhost.src = _dragImgEl.src;
@@ -166,37 +182,60 @@ function initCustomDrag() {
       }
     }
 
-    if (_dragActive && _dragGhost) {
-      _dragGhost.style.left = e.clientX + 'px';
-      _dragGhost.style.top  = e.clientY + 'px';
+    if (_dragActive) {
+      e.preventDefault();
+      if (_dragGhost) {
+        _dragGhost.style.left = e.clientX + 'px';
+        _dragGhost.style.top  = e.clientY + 'px';
+      }
     }
   });
 
-  document.addEventListener('mouseup', function(e) {
+  function endDrag(e) {
     if (!_dragSource) return;
 
-    const source    = _dragSource;
+    const source      = _dragSource;
     const wasDragging = _dragActive;
 
-    // Cleanup
     if (_dragImgEl) { _dragImgEl.style.opacity = ''; _dragImgEl = null; }
 
+    let targetSquare = null;
     if (_dragGhost) {
       _dragGhost.style.display = 'none';
       const elUnder = document.elementFromPoint(e.clientX, e.clientY);
       _dragGhost.style.display = '';
       document.body.removeChild(_dragGhost);
       _dragGhost = null;
-
-      if (wasDragging) {
-        _justDragged = true;
-        const targetSquare = getSquareFromElement(elUnder);
-        if (targetSquare && targetSquare !== source) {
-          executeDragDrop(source, targetSquare);
-        }
-      }
+      targetSquare = getSquareFromElement(elUnder);
     }
 
+    _dragSource = null;
+    _dragActive = false;
+
+    if (wasDragging) {
+      _justDragged = true; // suppress native click after drag
+      if (targetSquare && targetSquare !== source) {
+        executeDragDrop(source, targetSquare);
+      }
+    } else {
+      // Tap (no drag threshold crossed) — e.preventDefault() on pointerdown
+      // suppressed the native click, so we dispatch it manually here.
+      const p = game.get(source);
+      const pieceStr = p ? (p.color + p.type.toUpperCase()) : '';
+      if (puzzleMode) {
+        onPuzzleSquareClick(source, pieceStr);
+      } else {
+        onSquareClick(source, pieceStr);
+      }
+      _justDragged = true; // suppress any late-firing native click on desktop
+    }
+  }
+
+  document.addEventListener('pointerup', endDrag);
+  document.addEventListener('pointercancel', function() {
+    // Clean up without executing any move (e.g. interrupted by phone call)
+    if (_dragImgEl) { _dragImgEl.style.opacity = ''; _dragImgEl = null; }
+    if (_dragGhost) { document.body.removeChild(_dragGhost); _dragGhost = null; }
     _dragSource = null;
     _dragActive = false;
   });
