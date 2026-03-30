@@ -220,6 +220,16 @@ body > .piece-417db {
   cursor: pointer;
 }
 
+/* Custom drag ghost */
+.drag-ghost-chess {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%) scale(1.08);
+  cursor: grabbing;
+  opacity: 0.92;
+}
+
 .highlight-premove {
   background-color: rgba(91, 143, 217, 0.4) !important;
 }

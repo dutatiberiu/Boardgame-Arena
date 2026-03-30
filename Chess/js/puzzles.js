@@ -71,7 +71,7 @@ function setupPuzzle(data) {
   stopClock();
   timeControl = null;
 
-  createBoard({ orientation: puzzleColor, onDrop: onPuzzleDrop });
+  createBoard({ orientation: puzzleColor, onSquareClick: onPuzzleSquareClick });
 
   updateMoveHistory();
   updateCapturedPieces();
@@ -89,19 +89,57 @@ function setupPuzzle(data) {
 }
 
 /**
- * Handle drops in puzzle mode — check if the move matches the solution.
+ * Click-to-move handler for puzzle mode.
+ * Uses selectedSquare state from board.js for two-click move entry.
  */
-function onPuzzleDrop(source, target) {
-  removeGhostPiece();
+function onPuzzleSquareClick(square, piece) {
+  if (!puzzleMode || puzzleMoveIndex >= puzzleMoves.length) return;
+
+  const isPlayerTurn = (playerColor === 'white' && game.turn() === 'w') ||
+                       (playerColor === 'black' && game.turn() === 'b');
+  if (!isPlayerTurn) return;
+
+  // First click: select a piece
+  if (!selectedSquare) {
+    if (!piece) return;
+    const ownPiece = (playerColor === 'white' && piece.startsWith('w')) ||
+                     (playerColor === 'black' && piece.startsWith('b'));
+    if (!ownPiece) return;
+    selectSquare(square);
+    return;
+  }
+
+  // Second click: attempt move
+  const from = selectedSquare;
+  const to = square;
+
+  // Clicking own piece again — reselect
+  if (piece) {
+    const ownPiece = (playerColor === 'white' && piece.startsWith('w')) ||
+                     (playerColor === 'black' && piece.startsWith('b'));
+    if (ownPiece) {
+      selectSquare(square);
+      return;
+    }
+  }
+
+  clearClickHighlights();
+  executePuzzleMove(from, to);
+}
+
+/**
+ * Validate and execute a puzzle move attempt.
+ */
+function executePuzzleMove(source, target) {
   removeHighlights();
-  if (!puzzleMode || puzzleMoveIndex >= puzzleMoves.length) return 'snapback';
+  if (!puzzleMode || puzzleMoveIndex >= puzzleMoves.length) return;
 
   const expectedUCI = puzzleMoves[puzzleMoveIndex];
   const from = expectedUCI.substring(0, 2);
   const to = expectedUCI.substring(2, 4);
   const promo = expectedUCI.length > 4 ? expectedUCI[4] : undefined;
 
-  // Check if the player's move matches
+  // Check if the player's move matches the solution
   if (source !== from || target !== to) {
     DOM.statusText.textContent = 'Incorrect. Try again!';
     DOM.statusBar.classList.add('in-check');
@@ -111,12 +149,12 @@ function onPuzzleDrop(source, target) {
       DOM.statusBar.classList.remove('in-check');
       updatePuzzleStatus();
     }, 1500);
-    return 'snapback';
+    return;
   }
 
   // Execute the correct move
   const move = game.move({ from, to, promotion: promo || 'q' });
-  if (!move) return 'snapback';
+  if (!move) return;
 
   board.position(game.fen(), true);
   highlightSquare(from);

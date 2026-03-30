@@ -67,32 +67,24 @@ function attachResizeHandler() {
  * @param {Object} options
  * @param {string} [options.position] - Board position (default: game.fen())
  * @param {string} [options.orientation] - 'white' or 'black' (default: playerColor)
- * @param {boolean} [options.draggable] - Allow dragging (default: true)
- * @param {Function} [options.onDrop] - Custom onDrop handler (default: onDrop)
+ * @param {Function} [options.onSquareClick] - Custom click handler (default: onSquareClick)
  */
 function createBoard(options) {
   options = options || {};
   const config = {
-    draggable: options.draggable !== false,
+    draggable: false,   // we handle drag ourselves with threshold detection
     position: options.position || game.fen(),
     orientation: options.orientation || playerColor,
     pieceTheme: PIECE_THEME_URL,
     moveSpeed: 150,
-    snapbackSpeed: 250,
-    snapSpeed: 80
+    onSquareClick: options.onSquareClick || onSquareClick,
+    onMouseoverSquare: onMouseoverSquare,
+    onMouseoutSquare: onMouseoutSquare,
   };
-
-  if (config.draggable) {
-    config.onDragStart = onDragStart;
-    config.onDrop = options.onDrop || onDrop;
-    config.onSnapEnd = onSnapEnd;
-    config.onMouseoverSquare = onMouseoverSquare;
-    config.onMouseoutSquare = onMouseoutSquare;
-    config.onSquareClick = onSquareClick;
-  }
 
   if (board) board.destroy();
   board = Chessboard('board', config);
+  initCustomDrag();
   attachResizeHandler();
   return board;
 }
