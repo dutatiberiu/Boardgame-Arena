@@ -80,13 +80,12 @@ function onSquareClick(square, piece) {
 /* -------------------------------------------------------
    CUSTOM THRESHOLD DRAG
    ------------------------------------------------------- */
-let _dragSource   = null;
-let _dragStartX   = 0;
-let _dragStartY   = 0;
-let _dragActive   = false;
-let _dragEligible = false; // true only when the touched square holds the player's own piece
-let _dragGhost    = null;
-let _dragImgEl    = null;  // the img inside the source square (made transparent)
+let _dragSource  = null;
+let _dragStartX  = 0;
+let _dragStartY  = 0;
+let _dragActive  = false;
+let _dragGhost   = null;
+let _dragImgEl   = null;  // the img inside the source square (made transparent)
 let _dragInitialized = false;
 
 function getSquareFromElement(el) {
@@ -111,16 +110,13 @@ function initCustomDrag() {
   const boardEl = document.getElementById('board');
   if (!boardEl) return;
 
-  // Pointer events handle both mouse and touch uniformly.
-  //
-  // pointerdown fires for EVERY square tap — we always set _dragSource so
-  // endDrag can dispatch the click manually (native click is suppressed by
-  // e.preventDefault() which prevents iOS scroll/reflow).
-  // _dragEligible marks whether this square can start a drag (own piece, own turn).
-  // pointermove only activates drag when _dragEligible is true.
-
   boardEl.addEventListener('pointerdown', function(e) {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+    // Clear any stale _justDragged before early returns so it never blocks
+    // native click events on subsequent taps (empty squares / opponent pieces).
+    _justDragged = false;
+
     if (!gameActive) return;
     if (isViewingHistory()) return;
 
@@ -128,22 +124,25 @@ function initCustomDrag() {
     if (!square) return;
 
     const p = game.get(square);
-    const pieceIsPlayer = p && ((playerColor === 'white' && p.color === 'w') ||
-                                (playerColor === 'black' && p.color === 'b'));
+    if (!p) return;
+
+    const pieceIsPlayer = (playerColor === 'white' && p.color === 'w') ||
+                          (playerColor === 'black' && p.color === 'b');
     const isPlayerTurn  = (playerColor === 'white' && game.turn() === 'w') ||
                           (playerColor === 'black' && game.turn() === 'b');
 
-    // Track every square for click dispatch; drag only activates for own pieces
-    _dragSource   = square;
-    _dragStartX   = e.clientX;
-    _dragStartY   = e.clientY;
-    _dragActive   = false;
-    _dragEligible = pieceIsPlayer && (isPlayerTurn || aiThinking);
-    e.preventDefault(); // suppress native click — we dispatch it ourselves in endDrag
+    if (!pieceIsPlayer) return;
+    if (!isPlayerTurn && !aiThinking) return;
+
+    _dragSource = square;
+    _dragStartX = e.clientX;
+    _dragStartY = e.clientY;
+    _dragActive = false;
+    e.preventDefault(); // prevent iOS scroll/reflow on touch
   });
 
   document.addEventListener('pointermove', function(e) {
-    if (!_dragSource || !_dragEligible) return; // only drag own pieces
+    if (!_dragSource) return;
 
     const dx = e.clientX - _dragStartX;
     const dy = e.clientY - _dragStartY;
@@ -197,9 +196,8 @@ function initCustomDrag() {
       targetSquare = getSquareFromElement(elUnder);
     }
 
-    _dragSource   = null;
-    _dragActive   = false;
-    _dragEligible = false;
+    _dragSource = null;
+    _dragActive = false;
 
     if (wasDragging) {
       _justDragged = true;
@@ -207,7 +205,7 @@ function initCustomDrag() {
         executeDragDrop(source, targetSquare);
       }
     } else {
-      // Tap — dispatch click manually since native click was suppressed
+      // Tap on own piece — dispatch click manually (e.preventDefault suppressed native click)
       const p = game.get(source);
       const pieceStr = p ? (p.color + p.type.toUpperCase()) : '';
       if (puzzleMode) {
@@ -215,7 +213,7 @@ function initCustomDrag() {
       } else {
         onSquareClick(source, pieceStr);
       }
-      _justDragged = true; // safety: suppress any late-firing native click
+      _justDragged = true; // suppress any late-firing native click
     }
   }
 
