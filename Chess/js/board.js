@@ -43,7 +43,7 @@ function isOwnPiece(piece) {
 }
 
 function onSquareClick(square, piece) {
-  // Fired by chessboard.js on click (not after drag)
+  // Called from endDrag (tap) or chessboard.js native click (desktop fallback)
   if (_justDragged) { _justDragged = false; return; }
   if (!gameActive || isViewingHistory()) return;
   if (aiThinking) return;
@@ -80,12 +80,13 @@ function onSquareClick(square, piece) {
 /* -------------------------------------------------------
    CUSTOM THRESHOLD DRAG
    ------------------------------------------------------- */
-let _dragSource  = null;
-let _dragStartX  = 0;
-let _dragStartY  = 0;
-let _dragActive  = false;
-let _dragGhost   = null;
-let _dragImgEl   = null;  // the img inside the source square (made transparent)
+let _dragSource   = null;
+let _dragStartX   = 0;
+let _dragStartY   = 0;
+let _dragActive   = false;
+let _dragEligible = false; // true only when the touched square holds the player's own piece
+let _dragGhost    = null;
+let _dragImgEl    = null;  // the img inside the source square (made transparent)
 let _dragInitialized = false;
 
 function getSquareFromElement(el) {
@@ -110,26 +111,16 @@ function initCustomDrag() {
   const boardEl = document.getElementById('board');
   if (!boardEl) return;
 
-  // Use pointer events: handles both mouse and touch uniformly.
+  // Pointer events handle both mouse and touch uniformly.
   //
-  // Strategy for tap vs drag:
-  //   - pointerdown: e.preventDefault() prevents iOS layout shifts/scroll.
-  //     This also suppresses the browser's native 'click' event on mobile.
-  //   - pointerup with no drag: we manually dispatch the click handler so
-  //     click-to-move still works despite no native click event firing.
-  //   - _justDragged is set AFTER our manual dispatch, suppressing any
-  //     late-firing native click on desktop (where click still fires).
-  //   - Empty squares / opponent pieces: pointerdown returns early (no
-  //     preventDefault), so native click fires normally for those.
+  // pointerdown fires for EVERY square tap — we always set _dragSource so
+  // endDrag can dispatch the click manually (native click is suppressed by
+  // e.preventDefault() which prevents iOS scroll/reflow).
+  // _dragEligible marks whether this square can start a drag (own piece, own turn).
+  // pointermove only activates drag when _dragEligible is true.
 
   boardEl.addEventListener('pointerdown', function(e) {
-    if (e.pointerType === 'mouse' && e.button !== 0) return; // left-click only
-
-    // Always clear stale _justDragged here — before any early returns.
-    // This prevents a flag set by a previous tap-on-piece from blocking
-    // the native click that fires when the user taps an empty target square.
-    _justDragged = false;
-
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     if (!gameActive) return;
     if (isViewingHistory()) return;
 
@@ -137,25 +128,22 @@ function initCustomDrag() {
     if (!square) return;
 
     const p = game.get(square);
-    if (!p) return;
-
-    const pieceIsPlayer = (playerColor === 'white' && p.color === 'w') ||
-                          (playerColor === 'black' && p.color === 'b');
+    const pieceIsPlayer = p && ((playerColor === 'white' && p.color === 'w') ||
+                                (playerColor === 'black' && p.color === 'b'));
     const isPlayerTurn  = (playerColor === 'white' && game.turn() === 'w') ||
                           (playerColor === 'black' && game.turn() === 'b');
 
-    if (!pieceIsPlayer) return;
-    if (!isPlayerTurn && !aiThinking) return;
-
-    _dragSource = square;
-    _dragStartX = e.clientX;
-    _dragStartY = e.clientY;
-    _dragActive = false;
-    e.preventDefault(); // prevent iOS scroll/reflow on touch
+    // Track every square for click dispatch; drag only activates for own pieces
+    _dragSource   = square;
+    _dragStartX   = e.clientX;
+    _dragStartY   = e.clientY;
+    _dragActive   = false;
+    _dragEligible = pieceIsPlayer && (isPlayerTurn || aiThinking);
+    e.preventDefault(); // suppress native click — we dispatch it ourselves in endDrag
   });
 
   document.addEventListener('pointermove', function(e) {
-    if (!_dragSource) return;
+    if (!_dragSource || !_dragEligible) return; // only drag own pieces
 
     const dx = e.clientX - _dragStartX;
     const dy = e.clientY - _dragStartY;
@@ -209,17 +197,17 @@ function initCustomDrag() {
       targetSquare = getSquareFromElement(elUnder);
     }
 
-    _dragSource = null;
-    _dragActive = false;
+    _dragSource   = null;
+    _dragActive   = false;
+    _dragEligible = false;
 
     if (wasDragging) {
-      _justDragged = true; // suppress native click after drag
+      _justDragged = true;
       if (targetSquare && targetSquare !== source) {
         executeDragDrop(source, targetSquare);
       }
     } else {
-      // Tap (no drag threshold crossed) — e.preventDefault() on pointerdown
-      // suppressed the native click, so we dispatch it manually here.
+      // Tap — dispatch click manually since native click was suppressed
       const p = game.get(source);
       const pieceStr = p ? (p.color + p.type.toUpperCase()) : '';
       if (puzzleMode) {
@@ -227,7 +215,7 @@ function initCustomDrag() {
       } else {
         onSquareClick(source, pieceStr);
       }
-      _justDragged = true; // suppress any late-firing native click on desktop
+      _justDragged = true; // safety: suppress any late-firing native click
     }
   }
 
