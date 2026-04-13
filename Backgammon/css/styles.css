@@ -127,7 +127,7 @@ header p {
   box-shadow: var(--shadow), 0 0 60px rgba(212,162,78,.07);
   border: 2px solid var(--border);
   cursor: pointer;
-  touch-action: manipulation;
+  touch-action: none;
 }
 #boardCanvas.grabbable { cursor: grab; }
 #boardCanvas.grabbing { cursor: grabbing; }
