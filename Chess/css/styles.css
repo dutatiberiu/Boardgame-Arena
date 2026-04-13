@@ -213,7 +213,7 @@ body > .piece-417db {
 
 /* Highlight la mutări legale */
 .highlight-legal {
-  background: radial-gradient(circle, var(--highlight) 25%, transparent 25%) !important;
+  background: radial-gradient(circle at 50% 50%, rgba(200, 155, 60, 0.7) 22%, transparent 22%) !important;
 }
 .highlight-source {
   background-color: #c89b3c44 !important;
@@ -224,7 +224,7 @@ body > .piece-417db {
   background-color: #c89b3c66 !important;
 }
 .click-target {
-  background: radial-gradient(circle, var(--highlight) 25%, transparent 25%) !important;
+  background: radial-gradient(circle at 50% 50%, rgba(200, 155, 60, 0.7) 22%, transparent 22%) !important;
   cursor: pointer;
 }
 
