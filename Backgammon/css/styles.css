@@ -123,6 +123,7 @@ header p {
 #boardCanvas {
   width: 100%;
   max-width: 720px;
+  aspect-ratio: 3 / 2;
   border-radius: var(--radius);
   box-shadow: var(--shadow), 0 0 60px rgba(212,162,78,.07);
   border: 2px solid var(--border);

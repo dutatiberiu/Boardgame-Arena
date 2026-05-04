@@ -455,7 +455,7 @@ function getClickTarget(mx, my) {
   /* Bar — player's own pieces on bar */
   const barCX = FIELD_X + HALF_W + BAR_W / 2;
   if (bar[turn] > 0 && turn === playerColor) {
-    if (Math.abs(x - barCX) < BAR_W) return 24;
+    if (Math.abs(x - barCX) < BAR_W / 2) return 24;
   }
 
   /* Points */
