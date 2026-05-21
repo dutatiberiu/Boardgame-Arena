@@ -1,0 +1,522 @@
+/* ============================================================
+   CARNET DE SCHIȚE — shared design system pentru Caiet de Jocuri
+   Import this file in every page before the page-specific CSS.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Patrick+Hand&family=Kalam:wght@300;400;700&display=swap');
+
+/* ============================================================
+   1. DESIGN TOKENS
+   ============================================================ */
+:root {
+  /* paletă */
+  --paper:            #f7f1de;
+  --paper-darker:     #efe6cc;
+  --paper-card:       rgba(255, 255, 255, 0.55);
+  --ink:              #2c3e50;
+  --ink-soft:         rgba(44, 62, 80, 0.6);
+  --ink-faint:        rgba(44, 62, 80, 0.35);
+  --red-margin:       #d4717a;
+  --red-margin-soft:  rgba(212, 113, 122, 0.55);
+  --blue-line:        rgba(80, 100, 160, 0.2);
+  --blue-line-strong: rgba(80, 100, 160, 0.5);
+  --highlight:        #f3d77a;
+
+  /* tipografie */
+  --font-display: 'Caveat', 'Bradley Hand', 'Comic Sans MS', cursive;
+  --font-body:    'Patrick Hand', 'Bradley Hand', 'Comic Sans MS', cursive;
+  --font-script:  'Kalam', 'Caveat', cursive;
+
+  /* caiet */
+  --line-height-ruled: 24px;
+  --margin-left:       64px;
+
+  /* radius */
+  --radius-card: 6px;
+  --radius-pill: 999px;
+
+  /* animații */
+  --draw-duration: 0.7s;
+  --draw-easing:   cubic-bezier(0.22, 1, 0.36, 1);
+  --wiggle-duration: 0.4s;
+}
+
+/* ============================================================
+   2. RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background-color: var(--paper);
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent calc(var(--line-height-ruled) - 1px),
+    var(--blue-line) calc(var(--line-height-ruled) - 1px),
+    var(--blue-line) var(--line-height-ruled)
+  );
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.55;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* marginea roșie verticală */
+body::before {
+  content: '';
+  position: fixed;
+  left: var(--margin-left);
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--red-margin);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================================
+   3. TIPOGRAFIE GLOBALĂ
+   ============================================================ */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 8vw, 4rem);
+  line-height: 1;
+}
+
+h2 {
+  font-size: 42px;
+  line-height: 1.05;
+  position: relative;
+  display: inline-block;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: -4px;
+  right: -4px;
+  height: 10px;
+  background: var(--highlight);
+  opacity: 0.45;
+  z-index: -1;
+  border-radius: 2px;
+  transform: skew(-3deg);
+}
+
+h3 { font-size: 28px; }
+
+p {
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+/* ============================================================
+   4. BUTOANE
+   ============================================================ */
+.btn {
+  font-family: var(--font-display);
+  font-size: 22px;
+  background: var(--paper-card);
+  color: var(--ink);
+  border: 1.8px dashed var(--ink);
+  border-radius: var(--radius-card);
+  padding: 8px 24px 10px;
+  cursor: pointer;
+  transform: rotate(-1deg);
+  transition: all 0.2s ease-out;
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+}
+.btn:hover {
+  transform: rotate(0deg) translateY(-2px);
+  background: var(--paper-darker);
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+  border-style: solid;
+  border-color: var(--ink);
+}
+.btn-primary:hover {
+  background: var(--red-margin);
+  border-color: var(--red-margin);
+  color: var(--paper);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-style: dotted;
+}
+
+.btn-small {
+  font-size: 16px;
+  padding: 5px 14px 6px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ============================================================
+   5. INPUT-URI
+   ============================================================ */
+.input-field {
+  font-family: var(--font-body);
+  font-size: 18px;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px dashed var(--ink);
+  padding: 6px 4px;
+  color: var(--ink);
+  outline: none;
+}
+.input-field:focus {
+  border-bottom-color: var(--red-margin);
+  border-bottom-style: solid;
+}
+.input-field::placeholder {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+select.input-field {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.field-label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--ink-soft);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.field-row {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+/* ============================================================
+   6. MODAL
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(44, 62, 80, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.modal-box {
+  background: var(--paper-darker);
+  border: 1.8px dashed var(--ink);
+  border-radius: var(--radius-card);
+  padding: 28px 32px;
+  max-width: 440px;
+  width: 100%;
+  position: relative;
+  transform: rotate(-0.4deg);
+  box-shadow: 4px 6px 0 rgba(44, 62, 80, 0.12);
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 36px;
+  line-height: 1;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+.modal-body {
+  font-family: var(--font-body);
+  color: var(--ink-soft);
+  margin-bottom: 20px;
+  font-size: 17px;
+}
+
+/* ============================================================
+   7. SCORE DISPLAY
+   ============================================================ */
+.score-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--paper-card);
+  border: 1.5px dashed var(--ink);
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 22px;
+  transform: rotate(-1deg);
+}
+.score-display .star { color: var(--red-margin); font-size: 18px; }
+
+/* ============================================================
+   8. CARD DE JOC (folosit pe landing)
+   ============================================================ */
+.game-card {
+  background: var(--paper-card);
+  border: 1.8px solid rgba(44, 62, 80, 0.28);
+  border-radius: var(--radius-card);
+  padding: 14px;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.25s ease-out;
+  height: 96px;
+  box-sizing: border-box;
+  overflow: visible;
+  text-decoration: none;
+  color: var(--ink);
+  display: block;
+}
+.game-card:nth-child(4n+1) { transform: rotate(-2.4deg); }
+.game-card:nth-child(4n+2) { transform: rotate(1.8deg); }
+.game-card:nth-child(4n+3) { transform: rotate(-2.0deg); }
+.game-card:nth-child(4n+4) { transform: rotate(2.5deg); }
+.game-card:hover { transform: rotate(0deg) scale(1.025); z-index: 2; }
+
+.game-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 100%;
+}
+
+.game-icon {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+}
+
+.game-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.game-meta {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+  line-height: 1.3;
+  opacity: 0.6;
+}
+
+/* overlay draw-on-hover */
+.hover-deco {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* ============================================================
+   9. ANIMAȚII
+   ============================================================ */
+.draw-on-hover {
+  transition: stroke-dashoffset var(--draw-duration) var(--draw-easing);
+}
+.fade-on-hover {
+  opacity: 0;
+  transition: opacity 0.4s ease-out 0.4s;
+}
+/* text apare ca și cum se scrie, de la stânga la dreapta */
+.write-on-hover {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.42s;
+}
+.game-card:hover .draw-on-hover  { stroke-dashoffset: 0 !important; }
+.game-card:hover .fade-on-hover  { opacity: 1; }
+.game-card:hover .write-on-hover { clip-path: inset(0 0% 0 0); }
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25%       { transform: rotate(-3deg); }
+  75%       { transform: rotate(3deg); }
+}
+.wiggle-on-hover:hover { animation: wiggle var(--wiggle-duration) ease-in-out; }
+
+@keyframes scribble-in {
+  from { stroke-dashoffset: var(--len, 300); }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   10. NAV BACK LINK (folosit pe paginile de joc)
+   ============================================================ */
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--ink-faint);
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.nav-back:hover {
+  color: var(--red-margin);
+  border-bottom-color: var(--red-margin);
+}
+
+/* ============================================================
+   11. DOODLE-URI DE MARGINE
+   ============================================================ */
+.margin-doodle {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.margin-note {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--ink-faint);
+  transform: rotate(-3deg);
+  display: inline-block;
+  opacity: 0.7;
+}
+
+/* ============================================================
+   12. ZONA DOODLE
+   ============================================================ */
+.doodle-zone {
+  border-top: 1.6px dashed var(--ink-faint);
+  padding-top: 24px;
+  margin-top: 32px;
+}
+.dz-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  opacity: 0.5;
+  margin-bottom: 18px;
+}
+.dz-row {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  flex-wrap: wrap;
+}
+.dz-quote {
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1.3;
+  opacity: 0.78;
+  flex: 1;
+  min-width: 200px;
+}
+.dz-quote em {
+  font-style: normal;
+  color: var(--red-margin);
+}
+
+/* ============================================================
+   13. PANOURI (sidebar, info panels pe paginile de joc)
+   ============================================================ */
+.panel {
+  background: var(--paper-card);
+  border: 1.5px dashed var(--ink);
+  border-radius: var(--radius-card);
+  padding: 16px 18px;
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  margin-bottom: 10px;
+  color: var(--ink);
+}
+
+/* ============================================================
+   14. RESPONSIVE
+   ============================================================ */
+
+/* Tabletă mică / telefon mare */
+@media (max-width: 768px) {
+  :root {
+    --margin-left: 44px;
+  }
+
+  .btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Telefon */
+@media (max-width: 600px) {
+  :root {
+    --margin-left: 0px;
+  }
+
+  body {
+    font-size: 16px;
+  }
+
+  /* ascunde linia roșie pe telefon — prea îngust ca să aibă sens */
+  body::before { display: none; }
+
+  h2 { font-size: clamp(1.4rem, 6vw, 2rem); }
+
+  .game-card:nth-child(4n+1),
+  .game-card:nth-child(4n+2),
+  .game-card:nth-child(4n+3),
+  .game-card:nth-child(4n+4) {
+    transform: rotate(0deg);
+  }
+  .margin-doodle { display: none; }
+  .game-card:hover {
+    transform: scale(1.02);
+  }
+
+  .btn {
+    transform: rotate(0deg);
+    font-size: 1rem;
+    min-height: 44px;
+  }
+
+  .modal-box { transform: rotate(0deg); padding: 20px 18px; }
+
+  /* ascunde doodle-urile de margine pe ecrane mici */
+  .doodle-margins { display: none; }
+}
+
+/* Telefon mic */
+@media (max-width: 400px) {
+  .game-card { height: auto; min-height: 80px; }
+  .game-name { font-size: 1.3rem; }
+}

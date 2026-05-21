@@ -1,0 +1,106 @@
+/* ============================================================
+   doodles.css — Stiluri pentru biblioteca de doodle-uri
+   ============================================================
+   
+   Include acest fișier după CSS-ul principal al temei.
+   Funcționează împreună cu doodles.js (auto-placement) sau cu
+   plasare manuală prin atributul data-doodle.
+   ============================================================ */
+
+/* === Baza === */
+.doodle {
+  /* Folosește currentColor pentru cerneală — moștenește din părinte */
+  color: var(--ink, #2c3e50);
+  /* Variabilă pentru accentul roșu */
+  --accent: var(--red-margin, #d4717a);
+
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+  user-select: none;
+  pointer-events: none; /* nu interceptează click-uri */
+}
+
+/* === Mărimi predefinite === */
+.doodle[data-size="xs"] { width: 24px; height: 24px; }
+.doodle[data-size="sm"] { width: 36px; height: 36px; }
+.doodle[data-size="md"] { width: 48px; height: 48px; }
+.doodle[data-size="lg"] { width: 64px; height: 64px; }
+.doodle[data-size="xl"] { width: 88px; height: 88px; }
+
+/* default dacă nu specifici */
+.doodle:not([data-size]) { width: 48px; height: 48px; }
+
+/* === Opacitate (pentru doodle-uri „de fundal", mai sterse) === */
+.doodle[data-fade="light"]  { opacity: 0.4; }
+.doodle[data-fade="medium"] { opacity: 0.65; }
+.doodle[data-fade="full"]   { opacity: 1; }
+.doodle:not([data-fade])    { opacity: 0.7; } /* default */
+
+/* === Container pentru plasarea pe margini === */
+/* Pune .doodle-margins ca primul copil al body sau al containerului principal */
+.doodle-margins {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0; /* sub conținut */
+}
+
+.doodle-margins .doodle {
+  position: absolute;
+}
+
+/* === Helper pentru poziționare manuală === */
+.doodle.is-left   { left: var(--doodle-left, 8px); }
+.doodle.is-right  { right: var(--doodle-right, 8px); }
+.doodle.is-top    { top: var(--doodle-top, 8px); }
+.doodle.is-bottom { bottom: var(--doodle-bottom, 8px); }
+
+/* === Rotații preset (mai natural decât rotate aleator) === */
+.doodle[data-rotate="-12"] { transform: rotate(-12deg); }
+.doodle[data-rotate="-8"]  { transform: rotate(-8deg); }
+.doodle[data-rotate="-4"]  { transform: rotate(-4deg); }
+.doodle[data-rotate="4"]   { transform: rotate(4deg); }
+.doodle[data-rotate="8"]   { transform: rotate(8deg); }
+.doodle[data-rotate="12"]  { transform: rotate(12deg); }
+
+/* === Hover wiggle (opțional, pentru pagini interactive) === */
+.doodle[data-hover="wiggle"] {
+  pointer-events: auto;
+  transition: transform 0.3s ease-out;
+}
+.doodle[data-hover="wiggle"]:hover {
+  animation: doodle-wiggle 0.5s ease-in-out;
+}
+@keyframes doodle-wiggle {
+  0%, 100% { transform: rotate(var(--rotate, 0deg)); }
+  25%      { transform: rotate(calc(var(--rotate, 0deg) - 8deg)) scale(1.1); }
+  75%      { transform: rotate(calc(var(--rotate, 0deg) + 8deg)) scale(1.1); }
+}
+
+/* === Animație „desenează-mă" pentru apariții (opțional) === */
+@keyframes doodle-draw-in {
+  from { opacity: 0; transform: scale(0.7) rotate(var(--rotate, 0deg)); }
+  to   { opacity: var(--target-opacity, 0.7); transform: scale(1) rotate(var(--rotate, 0deg)); }
+}
+.doodle[data-enter="draw"] {
+  animation: doodle-draw-in 0.5s ease-out backwards;
+}
+
+/* === Responsive: ascunde doodle-uri pe mobil ca să nu obtureze conținutul === */
+@media (max-width: 640px) {
+  .doodle[data-hide-mobile] { display: none; }
+  .doodle:not([data-keep-mobile]) {
+    /* implicit, ascunde doodle-urile mari pe mobile */
+  }
+  .doodle[data-size="lg"],
+  .doodle[data-size="xl"] {
+    display: none;
+  }
+}
+
+/* === Print: ascunde toate doodle-urile === */
+@media print {
+  .doodle, .doodle-margins { display: none !important; }
+}

@@ -654,7 +654,7 @@ function updateThemeButton() {
 /* ===========================================================
    BOARD COLOR THEME
    =========================================================== */
-const BOARD_THEMES = ['classic', 'green', 'blue', 'wood'];
+const BOARD_THEMES = ['classic', 'carnet', 'green', 'blue', 'wood'];
 let currentBoardTheme = 'classic';
 
 function initBoardThemeToggle() {
@@ -664,8 +664,8 @@ function initBoardThemeToggle() {
   const saved = safeStorage.get('chess-arena-board-theme');
   if (saved && BOARD_THEMES.includes(saved)) {
     currentBoardTheme = saved;
-    applyBoardTheme(currentBoardTheme);
   }
+  applyBoardTheme(currentBoardTheme);
 
   btn.addEventListener('click', () => {
     const idx = BOARD_THEMES.indexOf(currentBoardTheme);
@@ -679,7 +679,25 @@ function applyBoardTheme(theme) {
   const container = document.getElementById('board-container');
   if (!container) return;
   BOARD_THEMES.forEach(t => container.classList.remove('board-theme-' + t));
-  if (theme !== 'classic') container.classList.add('board-theme-' + theme);
+  container.classList.add('board-theme-' + theme);
+
+  let overlay = document.getElementById('carnet-grid-overlay');
+  if (theme === 'carnet') {
+    if (!overlay) {
+      overlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      overlay.id = 'carnet-grid-overlay';
+      overlay.setAttribute('viewBox', '0 0 8 8');
+      overlay.setAttribute('preserveAspectRatio', 'none');
+      overlay.innerHTML = [1,2,3,4,5,6,7].map(i =>
+        `<line x1="${i}" y1="0" x2="${i}" y2="8" stroke="rgb(44,62,80)" stroke-opacity=".25" stroke-width=".04" stroke-dasharray=".15 .1"/>` +
+        `<line x1="0" y1="${i}" x2="8" y2="${i}" stroke="rgb(44,62,80)" stroke-opacity=".25" stroke-width=".04" stroke-dasharray=".15 .1"/>`
+      ).join('');
+      container.appendChild(overlay);
+    }
+    overlay.style.display = '';
+  } else if (overlay) {
+    overlay.style.display = 'none';
+  }
 }
 
 /* ===========================================================

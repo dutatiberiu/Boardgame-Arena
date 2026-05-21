@@ -1,197 +1,270 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ro">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Board Game Arena</title>
+  <title>Caiet de Jocuri</title>
+  <meta name="description" content="Caiet de Jocuri — jocuri de masă clasice în browser. Șah cu Stockfish, Table, Dame, X și 0.">
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Styles -->
+  <!-- Tema Carnet de Schițe -->
+  <link rel="stylesheet" href="themes/carnet.css">
+  <!-- Stiluri specifice landing page -->
   <link rel="stylesheet" href="css/styles.css">
+  <!-- Biblioteca de doodle-uri -->
+  <link rel="stylesheet" href="doodle library/doodles.css">
 </head>
 <body>
 
+<!-- SVG sprite doodle-uri — inline pentru compatibilitate file:// -->
+<div style="display:none" aria-hidden="true">
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <symbol id="d01" viewBox="0 0 60 60"><title>Stick figure</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="16" r="7"/><path d="M 30 23 L 30 42"/><path d="M 30 28 L 20 36 M 30 28 L 40 36"/><path d="M 30 42 L 22 54 M 30 42 L 38 54"/><path d="M 27 19 Q 30 21 33 19"/></g><circle cx="27" cy="15" r="0.8" fill="currentColor"/><circle cx="33" cy="15" r="0.8" fill="currentColor"/></symbol>
+    <symbol id="d02" viewBox="0 0 60 60"><title>Stick figure surpriză</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="14" r="6"/><path d="M 30 20 L 30 38"/><path d="M 30 26 L 14 22 M 30 26 L 46 30"/><path d="M 14 22 L 8 14 M 46 30 L 50 18"/><path d="M 30 38 L 20 54 M 30 38 L 42 54"/></g><circle cx="50" cy="18" r="1.5" fill="var(--accent,#d4717a)"/><circle cx="8" cy="14" r="1.5" fill="var(--accent,#d4717a)"/></symbol>
+    <symbol id="d03" viewBox="0 0 60 60"><title>Tip cu antene</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="30" cy="18" rx="11" ry="9"/><path d="M 25 22 Q 30 26 35 22"/><path d="M 22 12 L 22 8 M 38 12 L 38 8"/><path d="M 22 27 L 18 50"/><path d="M 38 27 L 42 50"/><path d="M 25 32 L 14 38 M 35 32 L 46 38"/></g><circle cx="26" cy="17" r="1.2" fill="currentColor"/><circle cx="34" cy="17" r="1.2" fill="currentColor"/></symbol>
+    <symbol id="d04" viewBox="0 0 60 60"><title>Robotel</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="10" width="20" height="20" rx="2"/><path d="M 24 24 L 36 24"/><path d="M 22 12 L 18 6 M 38 12 L 42 6"/><rect x="22" y="30" width="16" height="14"/><path d="M 22 36 L 14 42 M 38 36 L 46 42"/><path d="M 26 44 L 26 52 M 34 44 L 34 52"/></g><circle cx="26" cy="18" r="1.5" fill="currentColor"/><circle cx="34" cy="18" r="1.5" fill="currentColor"/><circle cx="18" cy="6" r="1.5" fill="var(--accent,#d4717a)"/><circle cx="42" cy="6" r="1.5" fill="var(--accent,#d4717a)"/></symbol>
+    <symbol id="d05" viewBox="0 0 60 60"><title>Monstrulet</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M 14 36 Q 14 18 30 16 Q 46 18 46 36 L 44 50 L 16 50 Z"/><circle cx="22" cy="32" r="3"/><circle cx="38" cy="32" r="3"/><path d="M 22 42 L 26 44 L 30 42 L 34 44 L 38 42"/><path d="M 16 22 L 12 14 M 44 22 L 48 14"/></g><circle cx="22" cy="32" r="1" fill="currentColor"/><circle cx="38" cy="32" r="1" fill="currentColor"/></symbol>
+    <symbol id="d06" viewBox="0 0 60 60"><title>Portret</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="22" r="14"/><path d="M 24 27 Q 30 32 36 27"/><path d="M 18 10 Q 20 6 24 8"/><path d="M 42 10 Q 40 6 36 8"/><path d="M 22 36 L 22 50 L 38 50 L 38 36"/></g><circle cx="25" cy="20" r="1.2" fill="currentColor"/><circle cx="35" cy="20" r="1.2" fill="currentColor"/><path d="M 25 42 L 35 42" stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="d07" viewBox="0 0 60 60"><title>Fata cu breton</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="24" r="11"/><path d="M 19 24 Q 22 14 30 13 Q 38 14 41 24 L 41 22 Q 38 16 30 16 Q 22 16 19 22 Z" fill="currentColor"/><path d="M 27 31 Q 30 33 33 31"/><path d="M 24 35 L 16 50 M 36 35 L 44 50"/></g><circle cx="25" cy="26" r="1" fill="currentColor"/><circle cx="35" cy="26" r="1" fill="currentColor"/></symbol>
+    <symbol id="d08" viewBox="0 0 60 60"><title>Extraterestru</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M 18 32 Q 14 18 28 14 Q 42 12 46 24 Q 48 36 38 40 L 36 50 L 24 50 L 22 38 Z"/><path d="M 26 32 L 34 32"/><path d="M 38 16 L 44 10"/></g><circle cx="26" cy="26" r="1.2" fill="currentColor"/><circle cx="36" cy="24" r="1.2" fill="currentColor"/><circle cx="44" cy="10" r="2.5" stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none"/></symbol>
+    <symbol id="d09" viewBox="0 0 60 60"><title>Spirala haotica</title><path stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M 10 30 Q 14 18 22 22 Q 30 28 22 36 Q 14 40 18 28 Q 24 18 32 24 Q 40 30 34 38 Q 28 44 32 34 Q 38 24 46 28 Q 52 34 46 42"/></symbol>
+    <symbol id="d10" viewBox="0 0 60 60"><title>Spirala melc</title><path stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M 30 12 Q 14 14 16 30 Q 18 46 30 44 Q 42 44 42 32 Q 42 22 32 22 Q 24 22 24 30 Q 24 36 30 36 Q 34 36 34 32"/></symbol>
+    <symbol id="d11" viewBox="0 0 60 60"><title>Unde paralele</title><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="currentColor" stroke-width="1.6" d="M 10 45 Q 14 35 18 45 Q 22 35 26 45 Q 30 35 34 45 Q 38 35 42 45 Q 46 35 50 45"/><path stroke="var(--accent,#d4717a)" stroke-width="1.4" d="M 10 35 Q 14 25 18 35 Q 22 25 26 35 Q 30 25 34 35 Q 38 25 42 35 Q 46 25 50 35"/><path stroke="currentColor" stroke-width="1.6" d="M 10 25 Q 14 15 18 25 Q 22 15 26 25 Q 30 15 34 25 Q 38 15 42 25 Q 46 15 50 25"/></g></symbol>
+    <symbol id="d12" viewBox="0 0 60 60"><title>Loop fara sens</title><path stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M 10 30 Q 16 14 24 20 Q 30 26 22 32 Q 14 36 22 24 Q 32 14 36 26 Q 40 38 30 42 Q 22 44 30 36 Q 42 28 48 38"/></symbol>
+    <symbol id="d13" viewBox="0 0 60 60"><title>Cod de bare</title><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="currentColor" stroke-width="1.6" d="M 12 50 L 12 14 M 22 50 L 22 18 M 32 50 L 32 12 M 42 50 L 42 20 M 52 50 L 52 16"/><path stroke="var(--accent,#d4717a)" stroke-width="1.4" d="M 12 14 Q 22 8 32 12 Q 42 16 52 14"/></g></symbol>
+    <symbol id="d14" viewBox="0 0 60 60"><title>Tinta</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="30" r="20"/><circle cx="30" cy="30" r="14"/><circle cx="30" cy="30" r="8"/></g><circle cx="30" cy="30" r="3" fill="var(--accent,#d4717a)"/></symbol>
+    <symbol id="d15" viewBox="0 0 60 60"><title>Linii ondulate</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M 10 16 Q 14 14 18 16 Q 22 14 26 16 Q 30 14 34 16 Q 38 14 42 16 Q 46 14 50 16"/><path d="M 10 24 Q 14 22 18 24 Q 22 22 26 24 Q 30 22 34 24 Q 38 22 42 24 Q 46 22 50 24"/><path d="M 10 32 Q 14 30 18 32 Q 22 30 26 32 Q 30 30 34 32 Q 38 30 42 32 Q 46 30 50 32"/><path d="M 10 40 Q 14 38 18 40 Q 22 38 26 40 Q 30 38 34 40 Q 38 38 42 40 Q 46 38 50 40"/><path d="M 10 48 Q 14 46 18 48 Q 22 46 26 48 Q 30 46 34 48 Q 38 46 42 48 Q 46 46 50 48"/></g></symbol>
+    <symbol id="d16" viewBox="0 0 60 60"><title>Labirint plictiseala</title><path stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M 12 12 L 48 12 L 48 16 L 14 16 L 14 20 L 48 20 L 48 24 L 14 24 L 14 28 L 48 28 L 48 32 L 14 32 L 14 36 L 48 36 L 48 40 L 14 40"/></symbol>
+    <symbol id="d17" viewBox="0 0 60 60"><title>Racheta</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M 18 36 L 30 8 L 42 36 L 36 36 L 30 46 L 24 36 Z"/><path d="M 24 36 L 24 42 L 18 50 M 36 36 L 36 42 L 42 50"/></g><path stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-linecap="round" d="M 28 50 L 30 56 M 32 50 L 30 56"/><ellipse cx="30" cy="22" rx="2" ry="3" fill="currentColor"/></symbol>
+    <symbol id="d18" viewBox="0 0 60 60"><title>OZN</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="30" cy="30" rx="22" ry="4"/><path d="M 14 30 Q 14 18 30 18 Q 46 18 46 30"/><rect x="22" y="22" width="4" height="4"/><rect x="34" y="22" width="4" height="4"/></g><path stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-linecap="round" d="M 20 36 L 18 44 M 30 36 L 30 46 M 40 36 L 42 44"/></symbol>
+    <symbol id="d19" viewBox="0 0 60 60"><title>Fulger</title><path stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M 20 12 L 40 12 L 36 26 L 44 26 L 30 50 L 32 32 L 22 32 Z"/></symbol>
+    <symbol id="d20" viewBox="0 0 60 60"><title>Planeta cu inel</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="32" r="12"/><ellipse cx="30" cy="32" rx="22" ry="6" transform="rotate(-20 30 32)"/></g><circle cx="26" cy="30" r="1" fill="currentColor"/><circle cx="34" cy="34" r="1" fill="var(--accent,#d4717a)"/></symbol>
+    <symbol id="d21" viewBox="0 0 60 60"><title>Amiba</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M 18 18 Q 22 8 30 12 Q 38 8 42 18 Q 50 22 46 30 Q 50 38 42 42 Q 38 50 30 46 Q 22 50 18 42 Q 10 38 14 30 Q 10 22 18 18 Z"/><path d="M 24 36 Q 30 32 36 36"/></g><circle cx="24" cy="26" r="1.5" fill="currentColor"/><circle cx="36" cy="26" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="d22" viewBox="0 0 60 60"><title>Balon de gand</title><path stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M 12 32 Q 12 20 30 18 Q 48 20 48 32 Q 48 42 30 42 Q 26 42 22 44 Q 20 48 24 44 Q 14 42 12 32 Z"/><circle cx="24" cy="28" r="1.2" fill="currentColor"/><circle cx="32" cy="28" r="1.2" fill="currentColor"/><circle cx="40" cy="28" r="1.2" fill="currentColor"/></symbol>
+    <symbol id="d23" viewBox="0 0 60 60"><title>Inima cu bifa</title><path stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M 18 20 Q 14 14 20 12 Q 28 14 30 20 Q 32 14 40 12 Q 46 14 42 20 Q 48 24 46 32 L 30 48 L 14 32 Q 12 24 18 20 Z"/><path stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M 24 26 L 28 30 L 36 22"/></symbol>
+    <symbol id="d24" viewBox="0 0 60 60"><title>Fantoma cu coif</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M 20 24 Q 20 14 30 14 Q 40 14 40 24 L 40 36 Q 40 46 30 46 Q 20 46 20 36 Z"/><path d="M 28 32 Q 30 34 32 32"/><path d="M 18 18 L 14 14 M 42 18 L 46 14"/></g><ellipse cx="26" cy="26" rx="1.5" ry="2" fill="currentColor"/><ellipse cx="34" cy="26" rx="1.5" ry="2" fill="currentColor"/><path stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-linecap="round" d="M 26 8 Q 30 4 34 8"/></symbol>
+    <symbol id="d25" viewBox="0 0 60 60"><title>Anul 2026</title><text x="30" y="42" font-family="Caveat,cursive" font-size="44" font-weight="700" fill="currentColor" text-anchor="middle" transform="rotate(-8 30 42)">2026</text><path stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-linecap="round" d="M 8 48 Q 30 52 52 46"/></symbol>
+    <symbol id="d26" viewBox="0 0 60 60"><title>wow</title><text x="30" y="36" font-family="Caveat,cursive" font-size="32" font-weight="700" fill="var(--accent,#d4717a)" text-anchor="middle" transform="rotate(-12 30 36)">wow</text><g stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-linecap="round"><path d="M 10 46 Q 30 50 50 44"/><path d="M 8 14 L 14 18 M 14 14 L 8 18"/></g></symbol>
+    <symbol id="d27" viewBox="0 0 60 60"><title>Question excitement</title><text x="30" y="40" font-family="Caveat,cursive" font-size="44" font-weight="700" fill="currentColor" text-anchor="middle">?!</text><circle cx="30" cy="30" r="22" stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-dasharray="3,3"/></symbol>
+    <symbol id="d28" viewBox="0 0 60 60"><title>hello smiley</title><text x="30" y="40" font-family="Caveat,cursive" font-size="32" font-weight="700" fill="currentColor" text-anchor="middle" transform="rotate(-6 30 40)">hello :)</text></symbol>
+    <symbol id="d29" viewBox="0 0 60 60"><title>Initiale cu inima</title><text x="30" y="34" font-family="Caveat,cursive" font-size="22" font-weight="700" fill="currentColor" text-anchor="middle">T + A</text><path stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M 14 38 Q 14 26 22 22 Q 28 24 30 30 Q 32 24 38 22 Q 46 26 46 38 L 30 52 Z"/></symbol>
+    <symbol id="d30" viewBox="0 0 60 60"><title>Infinit x9</title><g font-family="Caveat,cursive" font-size="14"><text x="14" y="22" fill="currentColor">∞</text><text x="26" y="22" fill="currentColor">∞</text><text x="38" y="22" fill="currentColor">∞</text><text x="14" y="38" fill="var(--accent,#d4717a)">∞</text><text x="26" y="38" fill="var(--accent,#d4717a)">∞</text><text x="38" y="38" fill="var(--accent,#d4717a)">∞</text><text x="14" y="54" fill="currentColor">∞</text><text x="26" y="54" fill="currentColor">∞</text><text x="38" y="54" fill="currentColor">∞</text></g></symbol>
+    <symbol id="d31" viewBox="0 0 60 60"><title>Numere si socoteala</title><g font-family="Caveat,cursive" font-size="14" fill="currentColor"><text x="14" y="20">1</text><text x="24" y="20">2</text><text x="34" y="20">3</text><text x="44" y="20">4</text><text x="14" y="34" fill="var(--accent,#d4717a)">5</text><text x="24" y="34">6</text><text x="34" y="34">7</text><text x="44" y="34">?</text></g><path stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-linecap="round" d="M 12 30 L 36 38"/></symbol>
+    <symbol id="d32" viewBox="0 0 60 60"><title>Cand se termina?</title><g font-family="Caveat,cursive" font-size="16" text-anchor="middle"><text x="30" y="20" fill="currentColor">când</text><text x="30" y="34" fill="currentColor">se</text><text x="30" y="48" fill="var(--accent,#d4717a)">termină?</text></g></symbol>
+    <symbol id="d33" viewBox="0 0 60 60"><title>Pisicuta</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="30" cy="34" rx="16" ry="11"/><circle cx="42" cy="26" r="9"/><path d="M 38 18 L 36 12 L 42 16 M 46 18 L 48 12 L 44 16"/><path d="M 40 30 L 42 31 L 44 30"/><path d="M 22 42 L 20 50 M 28 44 L 28 52 M 36 44 L 36 52"/></g><circle cx="44" cy="25" r="1.2" fill="currentColor"/><path stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-linecap="round" d="M 16 28 Q 10 26 8 30"/></symbol>
+    <symbol id="d34" viewBox="0 0 60 60"><title>Caine</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M 14 38 Q 12 26 22 22 Q 28 18 38 22 Q 48 26 46 38 L 44 44 L 18 44 Z"/><circle cx="38" cy="30" r="6"/><path d="M 36 24 L 34 18 L 40 22"/><path d="M 20 44 L 18 50 M 28 44 L 28 50 M 36 44 L 36 50 M 44 44 L 46 50"/></g><circle cx="40" cy="30" r="1" fill="currentColor"/><path stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-linecap="round" d="M 12 36 Q 6 32 8 28"/></symbol>
+    <symbol id="d35" viewBox="0 0 60 60"><title>Peste</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="34" cy="34" rx="14" ry="10"/><path d="M 20 34 L 12 30 L 14 38 Z"/><path d="M 22 32 L 18 30"/><path d="M 38 44 Q 42 50 48 44 M 44 44 Q 48 48 44 48"/></g><circle cx="14" cy="34" r="1" fill="currentColor"/><g stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-linecap="round"><path d="M 26 28 Q 30 26 34 28"/><path d="M 38 32 Q 42 30 46 32"/></g></symbol>
+    <symbol id="d36" viewBox="0 0 60 60"><title>Iepuras</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M 30 14 Q 18 14 18 28 Q 18 38 26 38 L 26 50 L 34 50 L 34 38 Q 42 38 42 28 Q 42 14 30 14 Z"/><path d="M 24 18 Q 18 8 14 14 M 36 18 Q 42 8 46 14"/><path d="M 26 32 L 34 32"/></g><circle cx="26" cy="26" r="1.2" fill="currentColor"/><circle cx="34" cy="26" r="1.2" fill="currentColor"/></symbol>
+    <symbol id="d37" viewBox="0 0 60 60"><title>Urs gras</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="30" cy="34" rx="16" ry="11"/><circle cx="30" cy="20" r="8"/><path d="M 24 14 Q 22 8 28 10 M 36 14 Q 38 8 32 10"/><path d="M 29 24 Q 30 26 31 24"/></g><circle cx="27" cy="20" r="0.8" fill="currentColor"/><circle cx="33" cy="20" r="0.8" fill="currentColor"/><ellipse cx="30" cy="34" rx="6" ry="3" stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none"/></symbol>
+    <symbol id="d38" viewBox="0 0 60 60"><title>Porc</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M 14 36 Q 14 24 24 22 L 30 16 L 30 22 Q 40 22 44 30 L 50 30 L 46 36 Q 46 42 40 42 L 18 42 Q 14 42 14 36 Z"/><path d="M 22 42 L 22 48 M 38 42 L 38 48"/></g><circle cx="40" cy="30" r="1" fill="currentColor"/><ellipse cx="38" cy="34" rx="2" ry="1" stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none"/></symbol>
+    <symbol id="d39" viewBox="0 0 60 60"><title>Vaca</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M 14 38 Q 10 26 20 22 Q 22 14 30 16 Q 38 14 40 22 Q 50 26 46 38 L 42 44 Q 30 44 30 38 Q 30 44 18 44 Z"/><path d="M 14 38 Q 8 40 6 36 M 46 38 Q 52 40 54 36"/></g><circle cx="22" cy="26" r="1" fill="currentColor"/><circle cx="38" cy="26" r="1" fill="currentColor"/><path stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none" stroke-linecap="round" d="M 28 32 Q 30 34 32 32"/></symbol>
+    <symbol id="d40" viewBox="0 0 60 60"><title>Bufnita</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="30" cy="32" rx="11" ry="14"/><path d="M 24 18 L 18 10 L 22 18 M 36 18 L 42 10 L 38 18"/><circle cx="24" cy="26" r="3"/><circle cx="36" cy="26" r="3"/><path d="M 28 34 Q 30 36 32 34"/></g><circle cx="24" cy="26" r="1" fill="currentColor"/><circle cx="36" cy="26" r="1" fill="currentColor"/></symbol>
+    <symbol id="d41" viewBox="0 0 60 60"><title>Val infinit</title><g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M 12 40 Q 14 36 18 40 Q 22 44 26 40 Q 30 36 34 40 Q 38 44 42 40 Q 46 36 50 40"/><path d="M 12 30 Q 14 26 18 30 Q 22 34 26 30 Q 30 26 34 30 Q 38 34 42 30 Q 46 26 50 30"/><path d="M 12 20 Q 14 16 18 20 Q 22 24 26 20 Q 30 16 34 20 Q 38 24 42 20 Q 46 16 50 20"/></g></symbol>
+    <symbol id="d42" viewBox="0 0 60 60"><title>Cercuelte</title><g stroke="currentColor" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="20" r="3"/><circle cx="30" cy="20" r="3"/><circle cx="40" cy="20" r="3"/><circle cx="20" cy="30" r="3"/><circle cx="40" cy="30" r="3"/><circle cx="20" cy="40" r="3"/><circle cx="30" cy="40" r="3"/><circle cx="40" cy="40" r="3"/></g><circle cx="30" cy="30" r="3" stroke="var(--accent,#d4717a)" stroke-width="1.4" fill="none"/></symbol>
+    <symbol id="d43" viewBox="0 0 60 60"><title>Zigzag dublu</title><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="currentColor" stroke-width="1.6" d="M 14 14 L 22 22 L 14 30 L 22 38 L 14 46"/><path stroke="currentColor" stroke-width="1.6" d="M 22 22 L 30 14 L 38 22 L 30 30 L 38 38 L 30 46"/><path stroke="var(--accent,#d4717a)" stroke-width="1.4" d="M 38 22 L 46 14 M 38 38 L 46 30 M 38 38 L 46 46"/></g></symbol>
+    <symbol id="d44" viewBox="0 0 60 60"><title>Cerneala curgand</title><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="currentColor" stroke-width="1.6" d="M 30 12 Q 32 18 30 24 Q 28 30 30 36 Q 32 42 30 48"/><path stroke="var(--accent,#d4717a)" stroke-width="1.4" d="M 18 18 Q 20 24 18 30 Q 16 36 18 42"/><path stroke="var(--accent,#d4717a)" stroke-width="1.4" d="M 42 18 Q 44 24 42 30 Q 40 36 42 42"/></g></symbol>
+    <symbol id="d45" viewBox="0 0 60 60"><title>Tabla jumate desenata</title><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="14" width="32" height="32" stroke-width="1.6"/><line x1="20" y1="14" x2="20" y2="46" stroke-width="1.1"/><line x1="26" y1="14" x2="26" y2="46" stroke-width="1.1"/><line x1="32" y1="14" x2="32" y2="46" stroke-width="1.1"/><line x1="38" y1="14" x2="38" y2="46" stroke-width="1.1"/><line x1="14" y1="20" x2="46" y2="20" stroke-width="1.1"/><line x1="14" y1="26" x2="46" y2="26" stroke-width="1.1"/><line x1="14" y1="32" x2="46" y2="32" stroke-width="1.1"/><line x1="14" y1="38" x2="46" y2="38" stroke-width="1.1"/></g><rect x="20" y="26" width="6" height="6" fill="currentColor"/><rect x="32" y="32" width="6" height="6" fill="currentColor"/><rect x="26" y="20" width="6" height="6" fill="var(--accent,#d4717a)"/></symbol>
+    <symbol id="d46" viewBox="0 0 60 60"><title>Linie ECG</title><path stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M 10 30 L 16 30 L 20 22 L 26 38 L 30 24 L 34 36 L 40 28 L 50 30"/></symbol>
+    <symbol id="d47" viewBox="0 0 60 60"><title>X si 0 abandonat</title><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="currentColor" stroke-width="1.6" d="M 30 10 L 30 50 M 10 30 L 50 30"/><path stroke="var(--accent,#d4717a)" stroke-width="1.4" d="M 14 14 L 26 26 M 26 14 L 14 26"/><circle stroke="var(--accent,#d4717a)" stroke-width="1.4" cx="40" cy="20" r="5"/><path stroke="var(--accent,#d4717a)" stroke-width="1.4" d="M 36 40 L 44 48 M 44 40 L 36 48"/><circle stroke="var(--accent,#d4717a)" stroke-width="1.4" cx="20" cy="44" r="5"/></g></symbol>
+    <symbol id="d48" viewBox="0 0 60 60"><title>Sageti in 4 directii</title><g stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M 30 8 L 30 26 M 22 16 L 30 8 L 38 16"/><path d="M 30 52 L 30 34 M 22 44 L 30 52 L 38 44"/><path d="M 8 30 L 26 30 M 16 22 L 8 30 L 16 38"/><path d="M 52 30 L 34 30 M 44 22 L 52 30 L 44 38"/></g></symbol>
+  </defs>
+</svg>
+</div>
+
   <div class="page">
+
+    <!-- Doodle stea — colț dreapta sus -->
+    <svg class="margin-doodle" style="top:72px;right:20px;width:40px;height:40px;opacity:0.45" viewBox="0 0 50 50" aria-hidden="true">
+      <g stroke="var(--ink)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M 25 8 L 28 19 L 39 19 L 30 26 L 33 38 L 25 31 L 17 38 L 20 26 L 11 19 L 22 19 Z"/>
+      </g>
+    </svg>
+
+    <!-- Doodle săgeată ondulată — stânga, indicând spre carduri -->
+    <svg class="margin-doodle" style="top:310px;left:-6px;width:24px;height:64px;opacity:0.4" viewBox="0 0 24 64" aria-hidden="true">
+      <g stroke="var(--ink)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M 12 4 Q 18 13 12 22 Q 6 31 12 40 Q 18 49 12 56"/>
+        <path d="M 8 52 L 12 57 L 16 52"/>
+      </g>
+    </svg>
 
     <!-- ============================================================
          HEADER
          ============================================================ -->
-    <header>
-      <div class="ornament">
-        <div class="ornament-line"></div>
-        <div class="ornament-diamond"></div>
-        <div class="ornament-line"></div>
+    <header class="site-header">
+
+      <!-- Logo 8b — cu raze de soare -->
+      <div class="logo-wrap">
+        <svg viewBox="0 0 240 160" width="200" height="134" aria-label="Caiet de Jocuri" class="site-logo">
+          <g stroke="#d4717a" stroke-width="2" stroke-linecap="round" fill="none">
+            <line x1="120" y1="14" x2="120" y2="24"/>
+            <line x1="62"  y1="30" x2="70"  y2="38"/>
+            <line x1="178" y1="30" x2="170" y2="38"/>
+            <line x1="22"  y1="80" x2="34"  y2="80"/>
+            <line x1="218" y1="80" x2="206" y2="80"/>
+            <line x1="62"  y1="130" x2="70" y2="122"/>
+            <line x1="178" y1="130" x2="170" y2="122"/>
+            <line x1="120" y1="146" x2="120" y2="136"/>
+            <line x1="40"  y1="50"  x2="48"  y2="56"  stroke-width="1.5"/>
+            <line x1="200" y1="50"  x2="192" y2="56"  stroke-width="1.5"/>
+            <line x1="40"  y1="110" x2="48"  y2="104" stroke-width="1.5"/>
+            <line x1="200" y1="110" x2="192" y2="104" stroke-width="1.5"/>
+          </g>
+          <path d="M 42 80 Q 40 42 88 34 Q 148 28 194 48 Q 210 60 206 88 Q 198 120 148 126 Q 86 132 52 110 Q 38 98 42 80 Z"
+                stroke="#2c3e50" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="120" y="72"  font-family="Caveat, cursive" font-size="40" font-weight="700" fill="#2c3e50" text-anchor="middle">Caiet</text>
+          <text x="120" y="104" font-family="Caveat, cursive" font-size="26" font-weight="700" fill="#d4717a" text-anchor="middle" letter-spacing="3">de Jocuri</text>
+        </svg>
       </div>
-      <h1>Board Game Arena</h1>
-      <p class="subtitle">Choose Your Battle</p>
+
+      <p class="site-subtitle">alege un joc și <em style="font-style:normal;color:var(--red-margin)">joacă-te</em></p>
+      <!-- squiggle mâzgălit sub subtitlu -->
+      <svg viewBox="0 0 180 10" width="180" height="10" aria-hidden="true" style="display:block;margin:2px auto 0;opacity:0.5">
+        <path d="M 5 5 Q 20 2 35 5 T 65 5 T 95 5 T 125 5 T 155 5 T 177 5" stroke="var(--red-margin)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+      </svg>
+
     </header>
 
     <!-- ============================================================
          GAME CARDS
          ============================================================ -->
-    <div class="games-grid">
+    <main>
+      <!-- anotare mâzgălită — ca o notă în caiet -->
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;margin-left:4px">
+        <span class="margin-note">4 idei ↓</span>
+        <svg viewBox="0 0 40 10" width="40" height="10" aria-hidden="true" style="opacity:0.35">
+          <path d="M 2 5 Q 10 2 20 5 T 38 5" stroke="var(--ink)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="games-grid">
 
-      <!-- CHESS CARD -->
-      <a href="Chess/index.html" class="game-card">
-        <div class="card-preview chess-preview">
-          <div class="chess-board-mini" id="chessMini"></div>
-        </div>
-        <div class="card-content">
-          <div class="card-badge">♚ Classic Strategy</div>
-          <div class="card-title">Chess</div>
-          <p class="card-desc">
-            Challenge the Stockfish AI in a game of chess and fight for checkmate.
-          </p>
-          <div class="card-features">
-            <span class="feature-tag">Stockfish AI</span>
-            <span class="feature-tag">Game Statistics</span>
-            <span class="feature-tag">FIDE Rules</span>
-            <span class="feature-tag">Easy / Hard</span>
-          </div>
-          <div class="card-cta">
-            Play now <span class="cta-arrow">→</span>
-          </div>
-        </div>
-      </a>
-
-      <!-- BACKGAMMON CARD -->
-      <a href="Backgammon/index.html" class="game-card">
-        <div class="card-preview backgammon-preview">
-          <div class="bg-board-mini">
-            <div class="bg-half">
-              <div class="bg-points-row">
-                <div class="bg-point t1"></div>
-                <div class="bg-point t2"></div>
-                <div class="bg-point t1"></div>
-                <div class="bg-point t2"></div>
-                <div class="bg-point t1"></div>
-                <div class="bg-point t2"></div>
-              </div>
-              <div class="bg-points-row">
-                <div class="bg-point up t2"></div>
-                <div class="bg-point up t1"></div>
-                <div class="bg-point up t2"></div>
-                <div class="bg-point up t1"></div>
-                <div class="bg-point up t2"></div>
-                <div class="bg-point up t1"></div>
-              </div>
-            </div>
-            <div class="bg-bar"></div>
-            <div class="bg-half">
-              <div class="bg-points-row">
-                <div class="bg-point t2"></div>
-                <div class="bg-point t1"></div>
-                <div class="bg-point t2"></div>
-                <div class="bg-point t1"></div>
-                <div class="bg-point t2"></div>
-                <div class="bg-point t1"></div>
-              </div>
-              <div class="bg-points-row">
-                <div class="bg-point up t1"></div>
-                <div class="bg-point up t2"></div>
-                <div class="bg-point up t1"></div>
-                <div class="bg-point up t2"></div>
-                <div class="bg-point up t1"></div>
-                <div class="bg-point up t2"></div>
-              </div>
+        <!-- CHESS CARD -->
+        <a href="Chess/index.html" class="game-card">
+          <!-- SVG icon șah -->
+          <div class="game-card-inner">
+            <svg viewBox="0 0 60 60" width="64" height="64" class="game-icon wiggle-on-hover" aria-hidden="true">
+              <g stroke="var(--ink)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M 14 50 Q 12 50 14 47 L 17 42 L 43 42 L 46 47 Q 48 50 46 50 Z"/>
+                <path d="M 19 42 L 20 35 L 40 35 L 41 42"/>
+                <path d="M 20 35 L 21 22 L 26 28 L 30 16 L 34 28 L 39 22 L 40 35"/>
+                <path d="M 30 16 L 30 8 M 26 11 L 34 11"/>
+                <path d="M 19 45 L 21 48 M 25 45 L 27 48 M 31 45 L 33 48 M 37 45 L 39 48" stroke-width="0.9" opacity="0.5"/>
+              </g>
+            </svg>
+            <div>
+              <div class="game-name">Șah</div>
+              <div class="game-meta">Stockfish 18 · WASM · ELO 400–3200</div>
             </div>
           </div>
-        </div>
-        <div class="card-content">
-          <div class="card-badge">⚂ Dice & Tactics</div>
-          <div class="card-title">Backgammon</div>
-          <p class="card-desc">
-            Roll the dice and move your pieces toward home. The AI evaluates
-            every move strategically — can you beat it?
+          <!-- hover: elipsă în jurul iconului + text jos -->
+          <svg class="hover-deco" viewBox="0 0 280 96" preserveAspectRatio="none" aria-hidden="true">
+            <ellipse cx="44" cy="46" rx="40" ry="36" stroke="var(--red-margin)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-dasharray="240" stroke-dashoffset="240" class="draw-on-hover" transform="rotate(-5 44 46)"/>
+            <text x="262" y="92" font-family="Caveat, Bradley Hand, cursive" font-size="19" fill="var(--red-margin)" font-weight="700" text-anchor="end" class="write-on-hover">îți scot șahul din cap</text>
+          </svg>
+        </a>
+
+        <!-- BACKGAMMON CARD -->
+        <a href="Backgammon/index.html" class="game-card">
+          <div class="game-card-inner">
+            <svg viewBox="0 0 60 60" width="64" height="64" class="game-icon wiggle-on-hover" aria-hidden="true">
+              <g stroke="var(--ink)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="8" y="14" width="44" height="32" rx="2"/>
+                <line x1="30" y1="14" x2="30" y2="46"/>
+                <path d="M 12 14 L 18 14 L 15 28 Z" stroke-width="1.5"/>
+                <path d="M 22 14 L 28 14 L 25 28 Z" stroke-width="1.5"/>
+                <path d="M 32 14 L 38 14 L 35 28 Z" stroke-width="1.5"/>
+                <path d="M 42 14 L 48 14 L 45 28 Z" stroke-width="1.5"/>
+                <circle cx="15" cy="40" r="3" stroke-width="1.5"/>
+              </g>
+            </svg>
+            <div>
+              <div class="game-name">Table</div>
+              <div class="game-meta">AI euristic · zaruri · Canvas</div>
+            </div>
+          </div>
+          <!-- hover: 3 stele în zone sigure + text jos -->
+          <svg class="hover-deco" viewBox="0 0 280 96" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M 44 10 L 47 19 L 57 19 L 49 25 L 52 34 L 44 29 L 36 34 L 39 25 L 31 19 L 41 19 Z" stroke="var(--red-margin)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="120" stroke-dashoffset="120" class="draw-on-hover"/>
+            <path d="M 22 68 L 24 73 L 29 73 L 25 76 L 27 81 L 22 78 L 17 81 L 19 76 L 15 73 L 20 73 Z" stroke="var(--red-margin)" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="65" stroke-dashoffset="65" class="draw-on-hover" style="transition-delay:0.22s"/>
+            <path d="M 252 76 L 254 81 L 260 81 L 255 85 L 257 90 L 252 87 L 247 90 L 249 85 L 244 81 L 250 81 Z" stroke="var(--red-margin)" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="70" stroke-dashoffset="70" class="draw-on-hover" style="transition-delay:0.42s"/>
+            <text x="158" y="93" font-family="Caveat, Bradley Hand, cursive" font-size="20" fill="var(--red-margin)" font-weight="700" text-anchor="middle" class="write-on-hover" transform="rotate(-3 158 93)">Trebuie să ceri zarul...</text>
+          </svg>
+        </a>
+
+        <!-- TIC TAC TOE CARD -->
+        <a href="Tic%20Tac%20Toe/index.html" class="game-card">
+          <div class="game-card-inner">
+            <svg viewBox="0 0 60 60" width="64" height="64" class="game-icon wiggle-on-hover" aria-hidden="true">
+              <g stroke="var(--ink)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="10" x2="22" y2="50"/>
+                <line x1="38" y1="10" x2="38" y2="50"/>
+                <line x1="10" y1="22" x2="50" y2="22"/>
+                <line x1="10" y1="38" x2="50" y2="38"/>
+                <path d="M 12 12 L 20 20 M 20 12 L 12 20" stroke-width="2.2" stroke="var(--red-margin)"/>
+                <circle cx="30" cy="30" r="5" stroke-width="2.2"/>
+                <path d="M 41 41 L 48 48 M 48 41 L 41 48" stroke-width="2.2" stroke="var(--red-margin)"/>
+              </g>
+            </svg>
+            <div>
+              <div class="game-name">X și 0</div>
+              <div class="game-meta">Minimax · 2 jucători · Easy/Hard</div>
+            </div>
+          </div>
+          <!-- hover: spirală în zona iconului + text jos -->
+          <svg class="hover-deco" viewBox="0 0 280 96" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M 56 48 Q 56 30 44 30 Q 28 30 28 48 Q 28 66 50 66 Q 68 66 68 44 Q 68 24 44 24 Q 26 24 26 48" stroke="var(--red-margin)" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-dasharray="195" stroke-dashoffset="195" class="draw-on-hover"/>
+            <text x="262" y="92" font-family="Caveat, Bradley Hand, cursive" font-size="20" fill="var(--red-margin)" font-weight="700" text-anchor="end" class="write-on-hover">colțul e al meu!</text>
+          </svg>
+        </a>
+
+        <!-- CHECKERS CARD -->
+        <a href="Checkers/index.html" class="game-card">
+          <div class="game-card-inner">
+            <svg viewBox="0 0 60 60" width="64" height="64" class="game-icon wiggle-on-hover" aria-hidden="true">
+              <g stroke="var(--ink)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="30" cy="30" rx="20" ry="19"/>
+                <ellipse cx="30" cy="30" rx="14" ry="13.5" stroke-width="1.4"/>
+                <path d="M 23 28 L 25 23 L 28 27 L 30 21 L 32 27 L 35 23 L 37 28" stroke-width="1.4"/>
+                <path d="M 22 38 L 25 41 M 28 38 L 31 41 M 34 38 L 37 41" stroke-width="0.9" opacity="0.5"/>
+              </g>
+            </svg>
+            <div>
+              <div class="game-name">Dame</div>
+              <div class="game-meta">Minimax + Alpha-Beta · 4 dificultăți</div>
+            </div>
+          </div>
+          <!-- hover: linie ondulată jos + cerculeț în zona iconului + text jos -->
+          <svg class="hover-deco" viewBox="0 0 280 96" preserveAspectRatio="none" aria-hidden="true">
+            <circle cx="44" cy="48" r="30" stroke="var(--red-margin)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-dasharray="188" stroke-dashoffset="188" class="draw-on-hover"/>
+            <path d="M 92 81 Q 102 77 112 81 T 132 81 T 152 81 T 172 81 T 192 81" stroke="var(--red-margin)" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="130" stroke-dashoffset="130" class="draw-on-hover" style="transition-delay:0.35s"/>
+            <text x="262" y="92" font-family="Caveat, Bradley Hand, cursive" font-size="20" fill="var(--red-margin)" font-weight="700" text-anchor="end" class="write-on-hover">regină!</text>
+          </svg>
+        </a>
+
+      </div>
+
+      <!-- ============================================================
+           DOODLE ZONE
+           ============================================================ -->
+      <div class="doodle-zone">
+        <div class="dz-title">// notițe</div>
+        <div class="dz-row">
+
+          <p class="dz-quote">
+            cel mai bun joc e cel jucat<br>
+            cu <em>prietenii</em>... dar până te vezi cu hăndrălăii, poți să-ți faci încălzirea aici.
           </p>
-          <div class="card-features">
-            <span class="feature-tag">Heuristic AI</span>
-            <span class="feature-tag">Canvas Render</span>
-            <span class="feature-tag">Bearing Off</span>
-            <span class="feature-tag">Pip Count</span>
-          </div>
-          <div class="card-cta">
-            Play now <span class="cta-arrow">→</span>
-          </div>
-        </div>
-      </a>
 
-      <!-- TIC TAC TOE CARD -->
-      <a href="Tic%20Tac%20Toe/index.html" class="game-card">
-        <div class="card-preview ttt-preview">
-          <div class="ttt-board-mini">
-            <div class="ttt-cell ttt-x"></div>
-            <div class="ttt-cell ttt-o"></div>
-            <div class="ttt-cell ttt-x"></div>
-            <div class="ttt-cell"></div>
-            <div class="ttt-cell ttt-x"></div>
-            <div class="ttt-cell ttt-o"></div>
-            <div class="ttt-cell ttt-o"></div>
-            <div class="ttt-cell"></div>
-            <div class="ttt-cell"></div>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="card-badge">✕ Simple Strategy</div>
-          <div class="card-title">Tic Tac Toe</div>
-          <p class="card-desc">
-            Challenge a friend or test your skills against the unbeatable
-            Minimax AI. One wrong move is all it takes.
-          </p>
-          <div class="card-features">
-            <span class="feature-tag">Minimax AI</span>
-            <span class="feature-tag">2-Player</span>
-            <span class="feature-tag">Easy / Hard</span>
-            <span class="feature-tag">Score Tracking</span>
-          </div>
-          <div class="card-cta">
-            Play now <span class="cta-arrow">→</span>
-          </div>
-        </div>
-      </a>
+          <span data-doodle="d47" data-size="xl" data-fade="medium" data-rotate="-4" style="flex-shrink:0"></span>
+          <span data-doodle="d40" data-size="xl" data-fade="medium" data-rotate="6" style="flex-shrink:0"></span>
+          <span data-doodle="d26" data-size="xl" data-fade="medium" data-rotate="-8" style="flex-shrink:0"></span>
 
-      <!-- CHECKERS CARD -->
-      <a href="Checkers/index.html" class="game-card">
-        <div class="card-preview checkers-preview">
-          <div class="checkers-board-mini" id="checkersMini"></div>
         </div>
-        <div class="card-content">
-          <div class="card-badge">○ Classic Board Game</div>
-          <div class="card-title">Checkers</div>
-          <p class="card-desc">
-            Jump over enemies, crown your kings, and outmaneuver the
-            Minimax AI with Alpha-Beta pruning across four difficulty levels.
-          </p>
-          <div class="card-features">
-            <span class="feature-tag">Minimax AI</span>
-            <span class="feature-tag">Game Statistics</span>
-            <span class="feature-tag">4 Difficulties</span>
-          </div>
-          <div class="card-cta">
-            Play now <span class="cta-arrow">→</span>
-          </div>
-        </div>
-      </a>
-
-    </div>
-
-    <!-- ============================================================
-         BOTTOM ORNAMENT
-         ============================================================ -->
-    <div class="bottom-ornament">
-      <div class="bo-line"></div>
-      <span class="bo-text">More games coming soon</span>
-      <div class="bo-line"></div>
-    </div>
-
-    <footer>
-      Board Game Arena — Have fun · lowkey. ·
+      </div>
+    </main>
   </div>
 
-  <script src="js/app.js"></script>
-
+  <script src="doodle library/doodles.js"></script>
+  <script src="doodle library/doodles-init.js"></script>
 </body>
 </html>

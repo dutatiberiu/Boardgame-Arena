@@ -43,6 +43,23 @@ const CK_D    = CK_R * 1.85;
 
 /* ---- Board color palettes ---- */
 const BOARD_THEMES = {
+  carnet: {
+    name:      'Carnet',
+    boardBg:   '#f7f1de',
+    fieldBg:   '#efe6cc',
+    border:    'rgba(44,62,80,0.35)',
+    ptLight:   '#d4717a',
+    ptDark:    'rgba(44,62,80,0.62)',
+    bar:       '#e8e0ca',
+    bearOff:   '#f2ecd8',
+    checkerW:  '#fdf8f0',
+    checkerWs: '#d5c8aa',
+    checkerB:  '#2c3e50',
+    checkerBs: '#1a2a38',
+    highlight: 'rgba(212,113,122,0.45)',
+    selected:  'rgba(212,113,122,0.72)',
+    numColor:  'rgba(44,62,80,0.28)',
+  },
   classic: {
     name:      'Classic',
     boardBg:   '#1e1b14',
@@ -113,8 +130,8 @@ const BOARD_THEMES = {
   },
 };
 
-let currentBoardTheme = 'classic';
-let COL = Object.assign({}, BOARD_THEMES.classic);
+let currentBoardTheme = 'carnet';
+let COL = Object.assign({}, BOARD_THEMES.carnet);
 
 /* ---- Named constants ---- */
 const MAX_ARCHIVE_SIZE = 50;
@@ -245,7 +262,8 @@ document.addEventListener('DOMContentLoaded', function() {
   if (savedTheme === 'light') document.body.classList.add('light-theme');
 
   const savedBoardTheme = safeStorage.get('bg-arena-board-theme');
-  if (savedBoardTheme && BOARD_THEMES[savedBoardTheme]) {
+  // 'classic' was old default — migrate to 'carnet'
+  if (savedBoardTheme && savedBoardTheme !== 'classic' && BOARD_THEMES[savedBoardTheme]) {
     currentBoardTheme = savedBoardTheme;
     Object.assign(COL, BOARD_THEMES[currentBoardTheme]);
   }
